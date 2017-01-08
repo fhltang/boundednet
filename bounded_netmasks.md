@@ -63,3 +63,13 @@ The value `R(M, N)` can also be expressed recursively as
 * otherwise, `R(M, N) == max{ F(n, N) }` for those `n` giving the minimal values in the "otherwise" clause of the recursive expression of `S(M, N)`
 
 In practice, we compute `S(M, N)` and `R(M, N)` concurrently so it is not quite as ugly as the recursive form above.
+
+### Asymptotic Complexity
+
+  1. Sort input networks: `O(N * log(N))`
+  1. Remove overlaps: `O(N)`
+  1. Precompute `F`: `O(N^2)`
+  1. Compute tables `S` and `R`: `O(N^2 * M)`
+  1. Backtracking: `O(M + N)`
+  
+Overall: `O(N^2 * M)`
