@@ -22,8 +22,10 @@ You are given `N` networks and you need to return `M` networks where the `M` net
 Throughout, we assume a fixed number `N0` of networks `{p[0], p[1], ... p[N0-1]}`.
 
 We may assume that these networks:
-   1. are sorted by their max address, and
+
+1. are sorted by their max address, and
    2. no two networks overlap.
+   
 If the networks do not satisfy these assumptions, we can sort them and remove overlaps.  This pre-processing step would take `O(N * log(N))` for the sort and `O(N)` to remove the overlaps.
 
 We consider solutions for smaller versions of the problem: for `N <= N0`, a solution to the problem applied to the "first `N` networks", i.e. `{p[0], ..., p[N-1]}`, is a set of networks `{q[0], ..., q[M-1]}` of minimal footprint size.  Let `P(M, N)` be the set of all minimal solutions applied to the first `N` networks.
