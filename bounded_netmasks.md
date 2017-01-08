@@ -48,7 +48,7 @@ Otherwise, we consider for all `n <= N`, partitionings of the `N` networks into 
 
 For a given `n`, it is possible that `LeastNetwork(n, N)` overlaps with a network in a solution in `Solutions(M-1, n)` which means that solution has some network that is a subset of `LeastNetwork(n, N)`.  (Note that the alternative of `LeastNetwork(n, N)` is a subset of some network in the solution is not possible because that would mean that solution is also a solution of `Solutions(M, N)`.)  In this case, the footprint size of `Solutions(M-1, n) union {LeastNetwork(n, N)}` is less than the sum of the footprint sizes of `Solutions(M-1, n)` and `{LeastNetwork(n, N)}`.
 
-However, if this happens then necessarily there is some `l < n` for which all solutions in `Solutions(M-1, l)` do not overlap with `LeastNetwork(l, N)`.
+However, if this happens then necessarily there is some `l < n` for which all solutions in `Solutions(M-1, l)` do not overlap with `LeastNetwork(l, N)`.  To see why this is so, suppose `q[i]` is a network in some solution in `Solutions(M-1, n)` such that `q[i]` is a subset of `F(n, M)`.  Now let `j` be any index for which `p[j]` is a subset of `q[i]`.  Thus `F(n, N)` also covers `p[j]` (since `F(n, N)` is a superset of `q[i]`).  If we pick `l` to be the least such `j`, then we know that `F(n, N)` covers `{p[l], ..., p[n-1]}` since we know that the networks are in ascending order and do not overlap.
 
 The value `MinSize(M, N)` can be expressed recursively as
 * if there is a solution in `Solutions(M, N-1)` which is also in `Solutions(M, N)`, then `MinSize(M, N) == MinSize(M, N-1)`
