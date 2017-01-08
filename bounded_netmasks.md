@@ -59,10 +59,10 @@ To help us determine whether a solution in `Solutions(M, N-1)` is also in `Solut
 Therefore, `max(p[N-1]) <= RightBound(M, N-1)` iff there is a solution in `Solutions(M, N-1)` that is also in `Solutions(M, N)`.
 
 The value `RightBound(M, N)` can also be expressed recursively as
-* if `RightBound(N-1, M)` > `max(p[N-1])`, then `RightBound(N, M) == RightBound(N-1, M)`
+* if `max(p[N-1]) <= RightBound(M, N-1)`, then `RightBound(M, N) == RightBound(M, N-1)`
 * otherwise, `RightBound(M, N) == max{ LeastNetwork(n, N) }` for those `n` giving the minimal values in the "otherwise" clause of the recursive expression of `MinSize(M, N)`
 
-In practice, we compute `MinSize(M, N)` and `RightBound(M, N)` concurrently so it is not quite as ugly as the recursive form above.
+In practice, we compute each entry `MinSize(M, N)` and `RightBound(M, N)` at the same time so it is not quite as ugly as the recursive form above.
 
 ### Asymptotic Complexity
 
