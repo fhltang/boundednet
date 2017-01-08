@@ -23,7 +23,7 @@ Throughout, we assume a fixed number `N0` of networks `{p[0], p[1], ... p[N0-1]}
 
 We may assume that these networks:
 
-1. are sorted by their max address, and
+   1. are sorted by their max address, and
    2. no two networks overlap.
    
 If the networks do not satisfy these assumptions, we can sort them and remove overlaps.  This pre-processing step would take `O(N * log(N))` for the sort and `O(N)` to remove the overlaps.
