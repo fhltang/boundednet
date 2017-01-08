@@ -64,6 +64,22 @@ The value `RightBound(M, N)` can also be expressed recursively as
 
 In practice, we compute each entry `MinSize(M, N)` and `RightBound(M, N)` at the same time so it is not quite as ugly as the recursive form above.
 
+### Dynamic Programming
+
+We compute the tables `MinSize` and `RightBound` row by row and cell by cell.
+
+### Backtracking
+
+We start at cell `(M, N0)` and apply the following:
+
+   * if `M==1`, then emit network `F(0, N)` and stop
+   * if the value of `MinSize(M, N) == MinSize(M, N-1)`, then do not emit any network and continue with `(M, N-1)`
+   * if the value of `MinSize(M, N) == min( MinSize(M-1, n) + size(F(n, N)) for n<=N )`, then we pick the least `n` for which the minimum is attained and
+      * emit `F(n, N)`
+      * continue with `(M-1, n)`
+      
+To see why this works, if `MinSize(M, N) == MinSize(M, N-1)` then we know that `max(p[N-1]) <= RightBound(M, N-1)` which means that the solution in `Solutions(M, N-1)` with the largest right bound is also in `Solutions(M, N)`; we want to find that solution with the largest right bound.  To ensure we find the solution with the largest right bound, we always choose the least `n` for which we attain the minimal value; this least value of `n` gives the network `F(n, N)` with the largest right bound.
+
 ### Asymptotic Complexity
 
   1. Sort input networks: `O(N * log(N))`
