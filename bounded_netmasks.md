@@ -59,7 +59,7 @@ To help us determine whether a solution in `P(M, N-1)` is also in `P(M, N)`, we 
 Therefore, `max(p[N-1]) <= R(M, N-1)` iff there is a solution in `P(M, N-1)` that is also in `P(M, N)`.
 
 The value `R(M, N)` can also be expressed recursively as
-* if `R(N-1, M)` > `max(p[n-1])`, then `R(N, M) == R(N-1, M)`
+* if `R(N-1, M)` > `max(p[N-1])`, then `R(N, M) == R(N-1, M)`
 * otherwise, `R(M, N) == max{ F(n, N) }` for those `n` giving the minimal values in the "otherwise" clause of the recursive expression of `S(M, N)`
 
 In practice, we compute `S(M, N)` and `R(M, N)` concurrently so it is not quite as ugly as the recursive form above.
