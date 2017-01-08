@@ -28,7 +28,7 @@ We may assume that these networks:
    
 If the networks do not satisfy these assumptions, we can sort them and remove overlaps.  This pre-processing step would take `O(N * log(N))` for the sort and `O(N)` to remove the overlaps.
 
-We consider solutions for smaller versions of the problem: for `N <= N0`, a solution to the problem applied to the "first `N` networks", i.e. `{p[0], ..., p[N-1]}`, is a set of networks `{q[0], ..., q[M-1]}` of minimal footprint size.  Let `Solutions(M, N)` be the set of all minimal solutions applied to the first `N` networks.
+We consider solutions for smaller versions of the problem: for `N <= N0`, a solution to the problem applied to the "first `N` networks", i.e. `{p[0], ..., p[N-1]}`, is a set of `K < M` networks `{q[0], ..., q[K]}` of minimal footprint size.  Let `Solutions(M, N)` be the set of all minimal solutions applied to the first `N` networks.
 
 The key is computing the function `MinSize(M, N)` which we define as "the minimal footprint size of solutions in `Solutions(M, N)`".  This function can be expressed recursively in `M` and `N` which will allow us to apply the standard dynamic programming trick to compute an `M * N` table.  With the table, we start from `MinSize(M, N0)` and backtrack to obtain the `M` networks which attain a minimal footprint.
 
