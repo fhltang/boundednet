@@ -54,7 +54,7 @@ The value `S(M, N)` can be expressed recursively as
 
 To help us determine whether a solution in `P(M, N-1)` is also in `P(M, N)`, we compute another function `R(M, N)` defined to be "the right-most address covered by some solution in `P(M, N)`".
 
-We know that `max(p[N-1]) <= R(M, N-1)` iff there is a solution in `P(M, N-1)` that is also in `P(M, N)`.
+Therefore, `max(p[N-1]) <= R(M, N-1)` iff there is a solution in `P(M, N-1)` that is also in `P(M, N)`.
 
 The value `R(M, N)` can also be expressed recursively as
 * if `R(N-1, M)` > `max(p[n-1])`, then `R(N, M) == R(N-1, M)`
