@@ -84,7 +84,7 @@ Now suppose that `q[i]` is a network in solution `x` in `Solutions(M-1, n)` and 
     size(union( x union {LeastNetwork(n, N)} )) == size(union( x ))
                                                 == MinSize(M-1, n)
  
-and so the expression `MinSize(M-1, n) + size(LeastNetwork(n, N)` overestimates when computing the minimum.  However, since `LeastNetwork(n, N)` covers `p[N-1]`, this means that `x` is also in `Solutions(M-1, N)` and by monotonicity of `MinSize`, we know that `MinSize(M-1, n) == MinSize(M-1, N)`.  Thus we have shown that the overestimate does not change the value of the minimum.
+and so the expression `MinSize(M-1, n) + size(LeastNetwork(n, N)` overestimates when computing the minimum.  However, since `LeastNetwork(n, N)` is a superset of `p[N-1]` and `q[i]` is a superset of `LeastNetwork(n, N)`, this means that `x` is also in `Solutions(M-1, N)`.  By monotonicity of `MinSize`, we know that `MinSize(M-1, n) == MinSize(M-1, N)`.  Thus we have shown that the overestimate does not change the value of the minimum.
 
 ### An Optimisation
 
