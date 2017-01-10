@@ -8,7 +8,7 @@ You are given `N` networks and you need to return `M` networks where the `M` net
 
    * An *address* is an integer in set `A = [0, 2^32)`.
    * A *network* is a subset of `A` (i.e. a set of addresses) of the form `[ a * 2^k, (a + 1) * 2^k )` for some `a` and `k`.
-   * The *footprint* of a set of networks is the union of the networks
+   * The *footprint* of a set of networks is the union of the networks.
    * The *footprint size* of a set of networks (or just *size* of a set of networks) is the cardinality of the footprint, i.e. the number of addresses in the union of the networks.
    
 ## Initial Observations
@@ -28,13 +28,19 @@ We may assume that these networks:
    
 If the networks do not satisfy these assumptions, we can sort them and remove overlaps.  This pre-processing step would take `O(N * log(N))` for the sort and `O(N)` to remove the overlaps.
 
-We consider solutions for smaller versions of the problem: for `N <= N0`, a solution to the problem applied to the "first `N` networks", i.e. `{p[0], ..., p[N-1]}`, is a set of `K < M` networks `{q[0], ..., q[K]}` of minimal footprint size.  Let `Solutions(M, N)` be the set of all minimal solutions applied to the first `N` networks.
+We consider solutions for smaller versions of the problem.  For `N <= N0`, we 
 
-The key is computing the function `MinSize(M, N)` which we define as "the minimum footprint size of all solutions in `Solutions(M, N)`".  This function can be expressed recursively in `M` and `N` which will allow us to apply the standard dynamic programming trick to compute an `M * N` table.  With the table, we start from `MinSize(M, N0)` and backtrack to obtain the `M` networks which attain a minimal footprint.
+   * define `Presolution(M, N)` to be the set of *presolutions* where a presolution is a set of at most `M` networks whose footprint is a superset of the footprint of the first `N` input networks `{p[0], ..., p[N-1]}`
+   * define `MinSize(M, N)` to be `min(size(Presolutions(M, N)))`, i.e. the smallest size footprint size of all presolutions in `PreSolution(M, N)`
+   * define `Solutions(M, N)` to be the subset of `Presolutions(M, N)` whose elements all have footprint size `MinSize(M, N)`.
 
-Note that `MinSize` is monotonically decreasing in its first argument and monotonically increasing in its second argument.  That is
+The key is finding a formulation of the function `MinSize(M, N)` recursive in `M` and `N`.  The recursive formulation allows us to apply the standard dynamic programming trick to compute an `M * N` table.  The table can be used to backtrack and obtain the `M` networks which attain a minimal footprint.
+
+Observation: `MinSize` is monotonically decreasing in its first argument and monotonically increasing in its second argument.  That is
    * for any `N`, `M1 <= M2` implies `MinSize(M1, N) >= MinSize(M2, N)`, and
    * for any `M`, `N1 <= N2` implies `MinSize(M, N1) <= MinSize(M, N2)`.
+   
+Corollary of monotonicity observation: If `x` is a solution in `Solutions(M, N-1)` and `x` covers `p[N-1]` (the `N`th network), then by definition `x` is in `Presolutions(M, N)`.  Since `MinSize` is monotonically increasing in its second argument, we know that in fact `x` is in `Solutions(M, N)`.
 
 ## Solution
 
@@ -42,24 +48,41 @@ Note that `MinSize` is monotonically decreasing in its first argument and monoto
 
 For `0 <= i <= j < N0`, define `LeastNetwork(i, j)` to be the smallest network containing the union of networks `{p[i], ... p[j-1]}`.
 
-For `i == j`, the union of networks is empty, so the smallest network containing the union of networks is the empty network.
+For `i == j`, the union of networks is empty and we define `LeastNetwork(j, j)` to be `{}`, the empty set.
 
-For a given `i` and `j`, `LeastNetwork(i, j)` can be computed in `O(1)` time.
+For given `i` and `j`, `LeastNetwork(i, j)` can be computed in `O(1)` time.
 
 ### Expressing `MinSize(M, N)` Recursively
 
-If a solution `x` in `Solutions(M, N-1)` has footprint covering `p[N-1]`, then since `MinSize` is monotonically increasing in its second argument we know that `x` is also in `Solutions(M, N)`.  Therefore `MinSize(M, N) == MinSize(M, N-1)`.
+We consider for all `n <= N`, partitionings of the `N` networks into the initial `n` networks and remaining `N - n` networks.  For a given `n`, we construct presolutions by taking each solution `x` in `Solutions(M-1, n)` together with the network `LeastNetwork(n, N)`.  The former covers the first `n` networks and the latter covers the remaining `N - n` networks.  We know that `x union {LeastNetwork(n, N)}` is in `Presolutions(M, N)` since it has at most `M` networks.
 
-Otherwise, we consider for all `n <= N`, partitionings of the `N` networks into the initial `n` networks and remaining `N - n` networks.  For a given `n`, we construct potential solutions by taking each solution in `Solutions(M-1, n)` which covers the first `n` networks and adding `LeastNetwork(n, N)` to cover the remaining `N - n` networks; together we have at most `M` networks.
+We will now show that for `M > 1`, that
 
-For a given `n`, it is possible that there is a network `q[i]` in a solution `y` in `Solutions(M-1, n)` which overlaps with `LeastNetwork(n, N)`.  In this case, we consider separately the scenarios where `q[i]` is a subset of `LeastNetwork(n, N)` and vice-versa.
+    MinSize(M, N) == min{ MinSize(M-1, n) + size(LeastNetwork(n, N)) for n<=N }
+    
+Suppose for all `n`, there is no overlap of any solution in `Solutions(M-1, n)` and `LeastNetwork(n, N)`.  In this case, we know that for any `x` in `Solutions(M-1, n)`
 
-Assuming `q[i]` is a subset of `LeastNetwork(n, N)`, then necessarily there is some `l < n` for which no solution in `Solutions(M-1, l)` overlaps with `LeastNetwork(l, N)`.  To see why this is so, let `j` be any index for which `p[j]` is a subset of `q[i]`.  Thus `p[j]` is a subset of `LeastNetwork(n, N)` (since `q[i]` is a subset of `LeastNetwork(n, N)`).  If we pick `l` to be the least such `j`, then we know that `LeastNetwork(n, N)` is a superset of all networks in `{p[l], ..., p[n-1]}` but none of the networks in `{p[0], ..., p[l-1]}` since we know that the networks are in ascending order and do not overlap.  This means that although the footprint size of `Solutions(M-1, n) union {LeastNetwork(n, N)}` is less than the sum of the footprint sizes of `Solutions(M-1, n)` and `{LeastNetwork(n, N)}`, the expression `min( MinSize(M-1, n) + size(LeastNetwor(n, N)) for n<=N )` correctly computes the minimum size of potential solutions constructed in this way.  Informally, we are saying that we can obtain a better solution by omitting `q[i]` and that we come across this better solution anyway when we consider `Solutions(M-1, j)` and `LeastNetwork(j, N)`.
+    size(union( x union {LeastNetwork(n, N)} )) == size(union(x)) + size(LeastNetwork(n, N))
+                                                == MinSize(M-1, n) + size(LeastNetwork(n, N))
+    
+and so the formula for `MinSize(M, N)` is clearly correct.
+
+Now suppose for some `n`, there is a network `q[i]` in some solution `x` in `Solutions(M-1, n)` which overlaps with `LeastNetwork(n, N)`.  Therefore the sum of the footprint sizes is greater than the footprint size of the union.  We will show that since we take the minimum over all `n <= N` that these "overestimates" do not affect the overall answer.  Using one of our initial observations about overlapping networks, it suffices to consider two scenarios: one where `q[i]` is a subset of `LeastNetwork(n, N)` and vice-versa.
+
+Assuming `q[i]` is a subset of `LeastNetwork(n, N)`, then necessarily there is some `L < n` for which `LeastNetwork(n, N)` is a superset of all networks in `{p[L], ..., p[n-1]}` but none of the networks in `{p[0], ..., p[L-1]}`.  This means that `LeastNetwork(n, N) == LeastNetwork(L, N)` since they cover the same networks.  For any `x` in `Solutions(M-1, L)`, since `x` cannot overlap with `LeastNetwork(L, N)`
+
+    size(union( x union {LeastNetwork(L, N)} )) == MinSize(M-1, L) + size(LeastNetwork(L, N))
+                                                == MinSize(M-1, L) + size(LeastNetwork(n, N))
+                                                <= MinSize(M-1, n) + size(LeastNetwork(n, N))
+
+by monotonicity of `MinSize`.  Therefore the true minimum woiuld be attained for some `n <= L`.
+                                      
+To see why there is such `L`, let `j` be any index for which `p[j]` is a subset of `q[i]`.  Thus `p[j]` is a subset of `LeastNetwork(n, N)` (since `q[i]` is a subset of `LeastNetwork(n, N)`).  If we pick `L` to be the least such `j`, then we know that `LeastNetwork(n, N)` is a superset of all networks in `{p[L], ..., p[n-1]}` but none of the networks in `{p[0], ..., p[L-1]}` since we know that the networks are in ascending order and do not overlap.
 
 Assuming `LeastNetwork(n, N)` is a subset of `q[i]`, ... SHIT, I PAINTED MYSELF INTO A CORNER
 
 The value `MinSize(M, N)` can be expressed recursively as
-* if there is a solution in `Solutions(M, N-1)` which is also in `Solutions(M, N)`, then `MinSize(M, N) == MinSize(M, N-1)`
+* (Optional optimisation) if there is a solution in `Solutions(M, N-1)` which is also in `Solutions(M, N)`, then `MinSize(M, N) == MinSize(M, N-1)`
 * otherwise `MinSize(M, N) == min( MinSize(M-1, n) + size(LeastNetwork(n, N)) for n<=N )`
 
 To help us determine whether a solution in `Solutions(M, N-1)` is also in `Solutions(M, N)`, we compute another function `RightBound(M, N)` defined to be "the right-most address covered by some solution in `Solutions(M, N)`".
