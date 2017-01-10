@@ -46,7 +46,7 @@ Corollary of monotonicity observation: If `x` is a solution in `Solutions(M, N-1
 
 ### Single Network Helper `LeastNetwork(i, j)`
 
-For `0 <= i <= j < N0`, define `LeastNetwork(i, j)` to be the smallest network containing the union of networks `{p[i], ... p[j-1]}`.
+For `0 <= i < j <= N0`, define `LeastNetwork(i, j)` to be the smallest network containing the union of networks `{p[i], ... p[j-1]}`.
 
 For `i == j`, the union of networks is empty and we define `LeastNetwork(j, j)` to be `{}`, the empty set.
 
