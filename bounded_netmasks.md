@@ -104,7 +104,7 @@ Therefore `MinSize(M, N)` can be expressed recursively as
 
 ### Dynamic Programming
 
-We compute the tables `MinSize` and `RightBound` for each row `M` starting from `1` and for incresaing values of `N` from `1` to `N0`. 
+We compute the tables `MinSize` and `RightBound` for each row `M` starting from `1` and for increasing values of `N` from `1` to `N0`. 
 
 ### Backtracking
 
