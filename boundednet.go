@@ -20,6 +20,10 @@ func NewNetwork(a int, k uint) Network {
 	}
 }
 
+func (this Network) Size() int {
+	return int(this.Right - this.Left)
+}
+
 type Solver interface {
 	Solve([]Network, int) []Network
 }
@@ -85,6 +89,33 @@ func (this *BacktrackingSolver) PrecomputeLeastNetwork() {
 }
 
 func (this *BacktrackingSolver) ComputeTable() {
+	this.Table = make([][]TableCell, this.M)
+	for m := 0; m < this.M; m++ {
+		this.Table[m] = make([]TableCell, len(this.Input))
+		for k := 0; k < len(this.Input); k++ {
+			if m == 0 {
+				network := this.LeastNetwork(0, k+1)
+				this.Table[m][k] = TableCell{
+					MinSize: network.Size(),
+					Network: network,
+				}
+			} else {
+				this.Table[m][k].MinSize = 1<<32
+				for n := 0; n <= k; n++ {
+					network:= this.LeastNetwork(n+1, k+1)
+					presolutionSize := network.Size() + this.Table[m-1][n].MinSize
+					if presolutionSize < this.Table[m][k].MinSize {
+						this.Table[m][k] = TableCell{
+							MinSize: presolutionSize,
+							Network: network,
+							NextRow: m-1,
+							NextCol: n,
+						}
+					}
+				}
+			}
+		}
+	}
 	// TODO: compute table
 }
 
