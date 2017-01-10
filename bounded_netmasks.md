@@ -67,7 +67,7 @@ Suppose for all `n`, there is no overlap of any solution in `Solutions(M-1, n)` 
     
 and so the formula for `MinSize(M, N)` is clearly correct.
 
-Now suppose for some `n`, there is a network `q[i]` in some solution `x` in `Solutions(M-1, n)` which overlaps with `LeastNetwork(n, N)`.  Therefore the sum of the footprint sizes is greater than the footprint size of the union.  We will show that since we take the minimum over all `n <= N` that these "overestimates" do not affect the overall answer.  Using one of our initial observations about overlapping networks, it suffices to consider two scenarios: one where `q[i]` is a subset of `LeastNetwork(n, N)` and vice-versa.
+Now suppose for some `n`, there is a network `q[i]` in some solution in `Solutions(M-1, n)` which overlaps with `LeastNetwork(n, N)`.  Therefore the sum of the footprint sizes is greater than the footprint size of the union.  We will show that since we take the minimum over all `n <= N` that these "overestimates" do not affect the overall answer.  Using one of our initial observations about overlapping networks, it suffices to consider two scenarios: one where `q[i]` is a subset of `LeastNetwork(n, N)` and vice-versa.
 
 Assuming `q[i]` is a subset of `LeastNetwork(n, N)`, then necessarily there is some `L < n` for which `LeastNetwork(n, N)` is a superset of all networks in `{p[L], ..., p[n-1]}` but none of the networks in `{p[0], ..., p[L-1]}`.  This means that `LeastNetwork(n, N) == LeastNetwork(L, N)` since they cover the same networks.  For any `x` in `Solutions(M-1, L)`, since `x` cannot overlap with `LeastNetwork(L, N)`
 
@@ -75,29 +75,36 @@ Assuming `q[i]` is a subset of `LeastNetwork(n, N)`, then necessarily there is s
                                                 == MinSize(M-1, L) + size(LeastNetwork(n, N))
                                                 <= MinSize(M-1, n) + size(LeastNetwork(n, N))
 
-by monotonicity of `MinSize`.  Therefore the true minimum woiuld be attained for some `n <= L`.
+by monotonicity of `MinSize`.  Therefore the true minimum would be attained for some `n <= L`.
                                       
 To see why there is such `L`, let `j` be any index for which `p[j]` is a subset of `q[i]`.  Thus `p[j]` is a subset of `LeastNetwork(n, N)` (since `q[i]` is a subset of `LeastNetwork(n, N)`).  If we pick `L` to be the least such `j`, then we know that `LeastNetwork(n, N)` is a superset of all networks in `{p[L], ..., p[n-1]}` but none of the networks in `{p[0], ..., p[L-1]}` since we know that the networks are in ascending order and do not overlap.
 
-Assuming `LeastNetwork(n, N)` is a subset of `q[i]`, ... SHIT, I PAINTED MYSELF INTO A CORNER
+Now suppose that `q[i]` is a network in solution `x` in `Solutions(M-1, n)` and assume `LeastNetwork(n, N)` is a subset of `q[i]`.  This means
 
-The value `MinSize(M, N)` can be expressed recursively as
-* (Optional optimisation) if there is a solution in `Solutions(M, N-1)` which is also in `Solutions(M, N)`, then `MinSize(M, N) == MinSize(M, N-1)`
-* otherwise `MinSize(M, N) == min( MinSize(M-1, n) + size(LeastNetwork(n, N)) for n<=N )`
+    size(union( x union {LeastNetwork(n, N)} )) == size(union( x ))
+                                                == MinSize(M-1, n)
+ 
+and so the expression `MinSize(M-1, n) + size(LeastNetwork(n, N)` overestimates when computing the minimum.  However, since `LeastNetwork(n, N)` covers `p[N-1]`, this means that `x` is also in `Solutions(M-1, N)` and by monotonicity of `MinSize`, we know that `MinSize(M-1, n) == MinSize(M-1, N)`.  Thus we have shown that the overestimate does not change the value of the minimum.
 
-To help us determine whether a solution in `Solutions(M, N-1)` is also in `Solutions(M, N)`, we compute another function `RightBound(M, N)` defined to be "the right-most address covered by some solution in `Solutions(M, N)`".
+### An Optimisation
+
+Define `RightBound(M, N)` to be the right-most address covered by all solutions in `Solutions(M, N)`, i.e.
+
+    RightBound(M, N) := max{ max(union(x)) for x in Solutions(M, N) }
 
 Therefore, `max(p[N-1]) <= RightBound(M, N-1)` iff there is a solution in `Solutions(M, N-1)` that is also in `Solutions(M, N)`.
 
 The value `RightBound(M, N)` can also be expressed recursively as
 * if `max(p[N-1]) <= RightBound(M, N-1)`, then `RightBound(M, N) == RightBound(M, N-1)`
-* otherwise, `RightBound(M, N) == max{ LeastNetwork(n, N) }` for those `n` giving the minimal values in the "otherwise" clause of the recursive expression of `MinSize(M, N)`
+* otherwise, `RightBound(M, N) == max{ LeastNetwork(n, N) }` for those `n<=N` giving the minimal values for `MinSize(M-1, n) + size(LeastNetwork(n, N))`.
 
-In practice, we compute each entry `MinSize(M, N)` and `RightBound(M, N)` at the same time so it is not quite as ugly as the recursive form above.
+Therefore `MinSize(M, N)` can be expressed recursively as
+   * if `max(p[N-1]) <= RightBound(M, N-1)` then `MinSize(M, N) == MinSize(M, N-1)`
+   * otherwise `MinSize(M, N) == min{ MinSize(M-1, n) + size(LeastNetwork(n, N)) for n<=N }`
 
 ### Dynamic Programming
 
-We compute the tables `MinSize` and `RightBound` row by row and cell by cell.
+We compute the tables `MinSize` and `RightBound` for each row `M` starting from `1` and for incresaing values of `N` from `1` to `N0`. 
 
 ### Backtracking
 
@@ -105,12 +112,10 @@ We start at cell `(M, N0)` and apply the following:
 
    * if `M==1`, then emit network `LeastNetwork(0, N)` and stop
    * if the value of `MinSize(M, N) == MinSize(M, N-1)`, then do not emit any network and continue with `(M, N-1)`
-   * if the value of `MinSize(M, N) == min( MinSize(M-1, n) + size(LeastNetwork(n, N)) for n<=N )`, then we pick the least `n` for which the minimum is attained and
-      * emit `LeastNetwork(n, N)`
-      * continue with `(M-1, n)`
+   * if the value of `MinSize(M, N) == MinSize(M-1, n) + size(LeastNetwork(n, N))` for some `n<=N`,
+      * emit `LeastNetwork(n, N)` if it is not `{}`
+      * continue with cell `(M-1, n)`
       
-To see why this works, if `MinSize(M, N) == MinSize(M, N-1)` then we know that `max(p[N-1]) <= RightBound(M, N-1)` which means that the solution in `Solutions(M, N-1)` with the largest right bound is also in `Solutions(M, N)`; we want to find that solution with the largest right bound.  To ensure we find the solution with the largest right bound, we always choose the least `n` for which we attain the minimal value; this least value of `n` gives the network `LeastNetwork(n, N)` with the largest right bound.
-
 ### Asymptotic Complexity
 
   1. Sort input networks: `O(N * log(N))`
