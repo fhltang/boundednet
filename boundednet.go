@@ -59,10 +59,28 @@ func (this *BacktrackingSolver) LeastNetwork(i, j int) Network {
 }
 
 func (this *BacktrackingSolver) PrecomputeLeastNetwork() {
-	this.leastNetwork = make([][]Network, 0, len(this.Input))
-	for i := 0; i < len(this.Input); i++ {
-		this.leastNetwork = append(this.leastNetwork, make([]Network, i + 1))
-		// TODO: do the precomputation
+	this.leastNetwork = make([][]Network, 0, len(this.Input) + 1)
+	for j := 0; j <= len(this.Input); j++ {
+		this.leastNetwork = append(this.leastNetwork, make([]Network, j + 1))
+		for i := 0; i <= j; i++ {
+			if i == j {
+				this.leastNetwork[j][i] = Network{}
+			} else {
+				left, right := this.Input[i], this.Input[j-1]
+				for left.A != right.A || left.K != right.K {
+					if right.K < left.K {
+						right = NewNetwork(int(right.A / 2), right.K + 1)
+					} else if left.K < right.K {
+						left = NewNetwork(int(left.A / 2), left.K + 1)
+					} else if left.A < right.A {
+						right = NewNetwork(int(right.A / 2), right.K + 1)
+					} else if right.A < left.A {
+						left = NewNetwork(int(left.A / 2), left.K + 1)
+					}
+				}
+				this.leastNetwork[j][i] = left
+			}
+		}
 	}
 }
 
