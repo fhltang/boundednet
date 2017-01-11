@@ -85,3 +85,20 @@ func TestComputeTable(t *testing.T) {
 		
 	}
 }
+
+func TestBacktrack(t *testing.T) {
+	input := []bn.Network{
+		bn.NewNetwork(0, 0),
+		bn.NewNetwork(1, 0),
+		bn.NewNetwork(8, 2),
+		bn.NewNetwork(15, 2),
+	}
+
+	solver := bn.BacktrackingSolver{}
+	solver.Init(input, 4)
+	solver.PrecomputeLeastNetwork()
+	solver.ComputeTable()
+
+	t.Error("Table", solver.Table)
+	t.Error("Solution", solver.Backtrack())
+}

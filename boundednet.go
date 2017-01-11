@@ -116,11 +116,18 @@ func (this *BacktrackingSolver) ComputeTable() {
 			}
 		}
 	}
-	// TODO: compute table
 }
 
 func (this *BacktrackingSolver) Backtrack() []Network {
-	output := make([]Network, this.M)
-	// TODO: do backtracking
+	output := make([]Network, 0, this.M)
+	m := this.M - 1
+	n := len(this.Input) - 1
+	for m != 0 {
+		cell := this.Table[m][n]
+		if cell.Network.Size() > 0 {
+			output = append(output, cell.Network)
+		}
+		m, n = cell.NextRow, cell.NextCol
+	}
 	return output
 }
