@@ -110,16 +110,17 @@ func (this *BacktrackingSolver) PrecomputeLeastNetwork() {
 			if i == j {
 				this.leastNetwork[j][i] = EmptyNetwork()
 			} else {
-				left, right := this.Input[i].ToNonEmptyNetwork(), this.Input[j-1].ToNonEmptyNetwork()
-				for left.A != right.A || left.K != right.K {
+				left := this.Input[i].ToNonEmptyNetwork()
+				right := this.Input[j-1].ToNonEmptyNetwork()
+				for left != right {
 					if right.K < left.K {
-						right = NonEmptyNetwork{A: int(right.A / 2), K: right.K + 1}
+						right = NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
 					} else if left.K < right.K {
-						left = NonEmptyNetwork{A: int(left.A / 2), K: left.K + 1}
+						left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
 					} else if left.A < right.A {
-						right = NonEmptyNetwork{A: int(right.A / 2), K: right.K + 1}
+						right = NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
 					} else if right.A < left.A {
-						left = NonEmptyNetwork{A: int(left.A / 2), K: left.K + 1}
+						left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
 					}
 				}
 				this.leastNetwork[j][i] = left.ToNetwork()
