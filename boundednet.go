@@ -63,7 +63,10 @@ func (this Network) ToNonEmptyNetwork() NonEmptyNetwork {
 }
 
 func (this NonEmptyNetwork) ToNetwork() Network {
-	return Network{Left: Address(this.A * (1 << this.K)), Right: Address((this.A + 1) * (1 << this.K))}
+	return Network{
+		Left: Address(this.A * (1 << this.K)),
+		Right: Address((this.A + 1) * (1 << this.K)),
+	}
 }
 
 type Solver interface {
@@ -134,28 +137,34 @@ func (this *BacktrackingSolver) LeastNetwork(i, j int) Network {
 func (this *BacktrackingSolver) PrecomputeLeastNetwork() {
 	this.leastNetwork = make([][]Network, 0, len(this.Input) + 1)
 	for j := 0; j <= len(this.Input); j++ {
-		this.leastNetwork = append(this.leastNetwork, make([]Network, j + 1))
+		this.leastNetwork = append(
+			this.leastNetwork, make([]Network, j + 1))
 		for i := 0; i <= j; i++ {
-			if i == j {
-				this.leastNetwork[j][i] = EmptyNetwork()
-			} else {
-				left := this.Input[i].ToNonEmptyNetwork()
-				right := this.Input[j-1].ToNonEmptyNetwork()
-				for left != right {
-					if right.K < left.K {
-						right = NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
-					} else if left.K < right.K {
-						left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
-					} else if left.A < right.A {
-						right = NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
-					} else if right.A < left.A {
-						left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
-					}
-				}
-				this.leastNetwork[j][i] = left.ToNetwork()
-			}
+			this.computeLeastNetwork(i, j)
 		}
 	}
+}
+
+func (this *BacktrackingSolver) computeLeastNetwork(i, j int) {
+	if i == j {
+		this.leastNetwork[j][i] = EmptyNetwork()
+		return
+	}
+
+	left := this.Input[i].ToNonEmptyNetwork()
+	right := this.Input[j-1].ToNonEmptyNetwork()
+	for left != right {
+		if right.K < left.K {
+			right = NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
+		} else if left.K < right.K {
+			left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
+		} else if left.A < right.A {
+			right = NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
+		} else if right.A < left.A {
+			left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
+		}
+	}
+	this.leastNetwork[j][i] = left.ToNetwork()
 }
 
 func (this *BacktrackingSolver) ComputeTable() {
@@ -163,26 +172,31 @@ func (this *BacktrackingSolver) ComputeTable() {
 	for m := 0; m < this.M; m++ {
 		this.Table[m] = make([]TableCell, len(this.Input))
 		for k := 0; k < len(this.Input); k++ {
-			if m == 0 {
-				network := this.LeastNetwork(0, k+1)
-				this.Table[m][k] = TableCell{
-					MinSize: network.Size(),
-					Network: network,
-				}
-			} else {
-				this.Table[m][k].MinSize = 1<<32
-				for n := 0; n <= k; n++ {
-					network:= this.LeastNetwork(n+1, k+1)
-					presolutionSize := network.Size() + this.Table[m-1][n].MinSize
-					if presolutionSize < this.Table[m][k].MinSize {
-						this.Table[m][k] = TableCell{
-							MinSize: presolutionSize,
-							Network: network,
-							NextRow: m-1,
-							NextCol: n,
-						}
-					}
-				}
+			this.computeCell(m, k)
+		}
+	}
+}
+
+func (this *BacktrackingSolver) computeCell(m, k int) {
+	if m == 0 {
+		network := this.LeastNetwork(0, k+1)
+		this.Table[m][k] = TableCell{
+			MinSize: network.Size(),
+			Network: network,
+		}
+		return
+	}
+
+	this.Table[m][k].MinSize = 1<<32  // max
+	for n := 0; n <= k; n++ {
+		network := this.LeastNetwork(n+1, k+1)
+		presolutionSize := network.Size() + this.Table[m-1][n].MinSize
+		if presolutionSize < this.Table[m][k].MinSize {
+			this.Table[m][k] = TableCell{
+				MinSize: presolutionSize,
+				Network: network,
+				NextRow: m-1,
+				NextCol: n,
 			}
 		}
 	}

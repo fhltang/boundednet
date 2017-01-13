@@ -20,11 +20,12 @@ func TestValid(t *testing.T) {
 		bn.Network{Left: 5, Right: 6},
 	}
 	for _, tc := range validCases {
-		t.Run(fmt.Sprintf("Valid [%d, %d)", tc.Left, tc.Right), func(t *testing.T) {
-			if !tc.Valid() {
-				t.Fail()
-			}
-		})
+		t.Run(fmt.Sprintf("Valid [%d, %d)", tc.Left, tc.Right),
+			func(t *testing.T) {
+				if !tc.Valid() {
+					t.Fail()
+				}
+			})
 	}
 
 	notValidCases := []bn.Network{
@@ -32,7 +33,8 @@ func TestValid(t *testing.T) {
 		bn.Network{Left: 8, Right: 11},
 	}
 	for _, tc := range notValidCases {
-		t.Run(fmt.Sprintf("Not valid [%d, %d)", tc.Left, tc.Right), func(t *testing.T) {
+		t.Run(fmt.Sprintf("Not valid [%d, %d)", tc.Left, tc.Right),
+			func(t *testing.T) {
 			if tc.Valid() {
 				t.Fail()
 			}
@@ -46,16 +48,24 @@ func TestToNonEmptyNetwork(t *testing.T) {
 		Expected bn.NonEmptyNetwork
 	}
 	cases := []Case{
-		{bn.Network{Left: 6, Right: 8}, bn.NonEmptyNetwork{A: 3, K: 1}},
-		{bn.Network{Left: 8, Right: 12}, bn.NonEmptyNetwork{A: 2, K: 2}},
-		{bn.Network{Left: 5, Right: 6}, bn.NonEmptyNetwork{A: 5, K: 0}},
+		{
+			bn.Network{Left: 6, Right: 8},
+			bn.NonEmptyNetwork{A: 3, K: 1},
+		}, {
+			bn.Network{Left: 8, Right: 12},
+			bn.NonEmptyNetwork{A: 2, K: 2},
+		},{
+			bn.Network{Left: 5, Right: 6},
+			bn.NonEmptyNetwork{A: 5, K: 0},
+		},
 	}
 	for _, tc := range cases {
-		t.Run(fmt.Sprintf("[%d, %d)", tc.Input.Left, tc.Input.Right), func(t *testing.T) {
-			if tc.Input.ToNonEmptyNetwork() != tc.Expected {
-				t.Fail()
-			}
-		})
+		t.Run(fmt.Sprintf("[%d, %d)", tc.Input.Left, tc.Input.Right),
+			func(t *testing.T) {
+				if tc.Input.ToNonEmptyNetwork() != tc.Expected {
+					t.Fail()
+				}
+			})
 	}
 }
 
@@ -132,7 +142,8 @@ func TestInit(t *testing.T) {
 			solver := bn.BacktrackingSolver{}
 			solver.Init(tc.Input, 1)
 			if !reflect.DeepEqual(tc.Expected, solver.Input) {
-				t.Error("Expected", tc.Expected, "got", solver.Input)
+				t.Error("Expected", tc.Expected,
+					"got", solver.Input)
 			}
 		})
 	}
@@ -166,12 +177,14 @@ func TestPrecomputeLeastNetwork(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run(fmt.Sprintf("L=%d, R=%d", tc.Left, tc.Right), func(t *testing.T) {
-			n := solver.LeastNetwork(tc.Left, tc.Right)
-			if tc.Expected != n {
-				t.Error("Expecting", tc.Expected, "got", n)
-			}
-		})
+		t.Run(fmt.Sprintf("L=%d, R=%d", tc.Left, tc.Right),
+			func(t *testing.T) {
+				n := solver.LeastNetwork(tc.Left, tc.Right)
+				if tc.Expected != n {
+					t.Error("Expecting", tc.Expected,
+						"got", n)
+				}
+			})
 	}
 }
 
@@ -206,7 +219,8 @@ func TestComputeTable(t *testing.T) {
 			r, c := tc.M - 1, tc.N -1
 			minSize := solver.Table[r][c].MinSize
 			if tc.ExpectedMinSize != minSize {
-				t.Error("Expecting MinSize ", tc.ExpectedMinSize, " got ", minSize)
+				t.Error("Expecting MinSize ",
+					tc.ExpectedMinSize, " got ", minSize)
 			}
 		})
 		
@@ -249,7 +263,8 @@ func TestBacktrack(t *testing.T) {
 		t.Run(fmt.Sprintf("M=%d", tc.M), func(t *testing.T) {
 			solution := solver.Backtrack(tc.M, tc.N)
 			if !reflect.DeepEqual(tc.Expected, solution) {
-				t.Error("Expected", tc.Expected, "got", solution)
+				t.Error("Expected", tc.Expected,
+					"got", solution)
 			}
 		})
 		
