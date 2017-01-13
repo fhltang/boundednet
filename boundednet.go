@@ -22,6 +22,9 @@ func (this Network) Size() int {
 
 // Normalise network into form [x*2^k, y*2^k) for largest k.
 func (this Network) Normalise() (int, int, uint) {
+	if this.Left == this.Right {
+		return 0, 0, 0
+	}
 	k := uint(0)
 	x := int(this.Left)
 	y := int(this.Right)
