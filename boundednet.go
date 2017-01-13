@@ -212,23 +212,19 @@ func (this BacktrackingSolver) computeCell(m, k int) TableCell {
 }
 
 func (this *BacktrackingSolver) Backtrack(m, n int) []Network {
-	output := make([]Network, 0, m)
+	output := make([]Network, m)
+	head := m
 	row, col := m-1, n-1
 	for {
 		cell := this.Table[row][col]
 		if cell.Network.Size() > 0 {
-			output = append(output, cell.Network)
+			head--
+			output[head] = cell.Network
 		}
 		if row == 0 {
 			break
 		}
 		row, col = cell.NextRow, cell.NextCol
 	}
-	// reverse output
-	left, right := 0, len(output)-1
-	for left < right {
-		output[left], output[right] = output[right], output[left]
-		left, right = left+1, right-1
-	}
-	return output
+	return output[head:]
 }
