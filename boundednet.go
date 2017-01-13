@@ -8,7 +8,7 @@ type Address uint32
 
 type Network struct {
 	// close-open interval
-	Left Address
+	Left  Address
 	Right Address
 }
 
@@ -32,11 +32,11 @@ func (this Network) Valid() bool {
 	// Try to find a, k such that this == [a*2^k, (a+1)*2^k)
 	a := this.Left
 	a1 := this.Right
-	for a != a1 && a % 2 == 0 && a1 % 2 == 0 {
+	for a != a1 && a%2 == 0 && a1%2 == 0 {
 		a = a >> 1
 		a1 = a1 >> 1
 	}
-	return a + 1 == a1
+	return a+1 == a1
 }
 
 type NonEmptyNetwork struct {
@@ -54,7 +54,7 @@ func (this Network) ToNonEmptyNetwork() NonEmptyNetwork {
 	k := uint(0)
 	a := int(this.Left)
 	a1 := int(this.Right)
-	for a != a1 && a % 2 == 0 && a1 % 2 == 0 {
+	for a != a1 && a%2 == 0 && a1%2 == 0 {
 		k++
 		a = a >> 1
 		a1 = a1 >> 1
@@ -64,7 +64,7 @@ func (this Network) ToNonEmptyNetwork() NonEmptyNetwork {
 
 func (this NonEmptyNetwork) ToNetwork() Network {
 	return Network{
-		Left: Address(this.A * (1 << this.K)),
+		Left:  Address(this.A * (1 << this.K)),
 		Right: Address((this.A + 1) * (1 << this.K)),
 	}
 }
@@ -82,10 +82,10 @@ type TableCell struct {
 
 type BacktrackingSolver struct {
 	Input []Network
-	M int
-	
+	M     int
+
 	leastNetwork [][]Network
-	Table [][]TableCell
+	Table        [][]TableCell
 }
 
 func (this *BacktrackingSolver) Solve(input []Network, m int) []Network {
@@ -99,7 +99,8 @@ func (this *BacktrackingSolver) Solve(input []Network, m int) []Network {
 }
 
 type ByLeftWidth []Network
-func (this ByLeftWidth) Len() int { return len(this) }
+
+func (this ByLeftWidth) Len() int      { return len(this) }
 func (this ByLeftWidth) Swap(i, j int) { this[i], this[j] = this[j], this[i] }
 func (this ByLeftWidth) Less(i, j int) bool {
 	if this[i].Left == this[j].Left {
@@ -117,16 +118,16 @@ func (this *BacktrackingSolver) Init(input []Network, m int) {
 
 	// Remove overlapping networks.
 	i := 0
-	for j := 0; j < len(this.Input) - 1; j++ {
+	for j := 0; j < len(this.Input)-1; j++ {
 		if this.Input[j].Right <= this.Input[j+1].Left {
-			if  i < j {
+			if i < j {
 				this.Input[i+1] = this.Input[j+1]
 			}
 			i++
 		}
 	}
 	this.Input = this.Input[:i+1]
-	
+
 	this.M = m
 }
 
@@ -135,10 +136,10 @@ func (this *BacktrackingSolver) LeastNetwork(i, j int) Network {
 }
 
 func (this *BacktrackingSolver) PrecomputeLeastNetwork() {
-	this.leastNetwork = make([][]Network, 0, len(this.Input) + 1)
+	this.leastNetwork = make([][]Network, 0, len(this.Input)+1)
 	for j := 0; j <= len(this.Input); j++ {
 		this.leastNetwork = append(
-			this.leastNetwork, make([]Network, j + 1))
+			this.leastNetwork, make([]Network, j+1))
 		for i := 0; i <= j; i++ {
 			this.computeLeastNetwork(i, j)
 		}
@@ -187,7 +188,7 @@ func (this *BacktrackingSolver) computeCell(m, k int) {
 		return
 	}
 
-	this.Table[m][k].MinSize = 1<<32  // max
+	this.Table[m][k].MinSize = 1 << 32 // max
 	for n := 0; n <= k; n++ {
 		network := this.LeastNetwork(n+1, k+1)
 		presolutionSize := network.Size() + this.Table[m-1][n].MinSize
@@ -195,7 +196,7 @@ func (this *BacktrackingSolver) computeCell(m, k int) {
 			this.Table[m][k] = TableCell{
 				MinSize: presolutionSize,
 				Network: network,
-				NextRow: m-1,
+				NextRow: m - 1,
 				NextCol: n,
 			}
 		}
@@ -204,7 +205,7 @@ func (this *BacktrackingSolver) computeCell(m, k int) {
 
 func (this *BacktrackingSolver) Backtrack(m, n int) []Network {
 	output := make([]Network, 0, m)
-	row, col := m - 1, n - 1
+	row, col := m-1, n-1
 	for {
 		cell := this.Table[row][col]
 		if cell.Network.Size() > 0 {
@@ -216,10 +217,10 @@ func (this *BacktrackingSolver) Backtrack(m, n int) []Network {
 		row, col = cell.NextRow, cell.NextCol
 	}
 	// reverse output
-	left, right := 0, len(output) - 1
+	left, right := 0, len(output)-1
 	for left < right {
 		output[left], output[right] = output[right], output[left]
-		left, right = left + 1, right - 1
+		left, right = left+1, right-1
 	}
 	return output
 }

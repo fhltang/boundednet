@@ -35,16 +35,16 @@ func TestValid(t *testing.T) {
 	for _, tc := range notValidCases {
 		t.Run(fmt.Sprintf("Not valid [%d, %d)", tc.Left, tc.Right),
 			func(t *testing.T) {
-			if tc.Valid() {
-				t.Fail()
-			}
-		})
+				if tc.Valid() {
+					t.Fail()
+				}
+			})
 	}
 }
 
 func TestToNonEmptyNetwork(t *testing.T) {
 	type Case struct {
-		Input bn.Network
+		Input    bn.Network
 		Expected bn.NonEmptyNetwork
 	}
 	cases := []Case{
@@ -54,7 +54,7 @@ func TestToNonEmptyNetwork(t *testing.T) {
 		}, {
 			bn.Network{Left: 8, Right: 12},
 			bn.NonEmptyNetwork{A: 2, K: 2},
-		},{
+		}, {
 			bn.Network{Left: 5, Right: 6},
 			bn.NonEmptyNetwork{A: 5, K: 0},
 		},
@@ -71,11 +71,11 @@ func TestToNonEmptyNetwork(t *testing.T) {
 
 func TestInit(t *testing.T) {
 	type Case struct {
-		Name string
-		Input []bn.Network
+		Name     string
+		Input    []bn.Network
 		Expected []bn.Network
 	}
-	cases := []Case {
+	cases := []Case{
 		{
 			"SortedNoOverlap",
 			[]bn.Network{
@@ -163,8 +163,8 @@ func TestPrecomputeLeastNetwork(t *testing.T) {
 	solver.PrecomputeLeastNetwork()
 
 	type Case struct {
-		Left int
-		Right int
+		Left     int
+		Right    int
 		Expected bn.Network
 	}
 
@@ -202,8 +202,8 @@ func TestComputeTable(t *testing.T) {
 	solver.ComputeTable()
 
 	type Case struct {
-		N int
-		M int
+		N               int
+		M               int
 		ExpectedMinSize int
 	}
 
@@ -216,14 +216,14 @@ func TestComputeTable(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(fmt.Sprintf("N=%d M=%d", tc.M, tc.N), func(t *testing.T) {
-			r, c := tc.M - 1, tc.N -1
+			r, c := tc.M-1, tc.N-1
 			minSize := solver.Table[r][c].MinSize
 			if tc.ExpectedMinSize != minSize {
 				t.Error("Expecting MinSize ",
 					tc.ExpectedMinSize, " got ", minSize)
 			}
 		})
-		
+
 	}
 }
 
@@ -241,8 +241,8 @@ func TestBacktrack(t *testing.T) {
 	solver.ComputeTable()
 
 	type Case struct {
-		M int
-		N int
+		M        int
+		N        int
 		Expected []bn.Network
 	}
 	cases := []Case{
@@ -267,6 +267,6 @@ func TestBacktrack(t *testing.T) {
 					"got", solution)
 			}
 		})
-		
+
 	}
 }
