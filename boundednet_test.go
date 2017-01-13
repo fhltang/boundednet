@@ -82,6 +82,20 @@ func TestInit(t *testing.T) {
 			},
 		},
 		{
+			"SortedWithFullOverlap",
+			[]bn.Network{
+				bn.Network{0, 1},
+				bn.Network{0, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+			[]bn.Network{
+				bn.Network{0, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+		},
+		{
 			"UnsortedNoOverlap",
 			[]bn.Network{
 				bn.Network{32, 36},

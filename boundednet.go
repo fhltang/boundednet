@@ -95,17 +95,22 @@ func (this *BacktrackingSolver) Solve(input []Network, m int) []Network {
 	return this.Backtrack(this.M, len(this.Input))
 }
 
-type ByLeft []Network
-func (this ByLeft) Len() int { return len(this) }
-func (this ByLeft) Swap(i, j int) { this[i], this[j] = this[j], this[i] }
-func (this ByLeft) Less(i, j int) bool { return this[i].Left < this[j].Left }
+type ByLeftWidth []Network
+func (this ByLeftWidth) Len() int { return len(this) }
+func (this ByLeftWidth) Swap(i, j int) { this[i], this[j] = this[j], this[i] }
+func (this ByLeftWidth) Less(i, j int) bool {
+	if this[i].Left == this[j].Left {
+		return this[i].Right > this[j].Right
+	}
+	return this[i].Left < this[j].Left
+}
 
 func (this *BacktrackingSolver) Init(input []Network, m int) {
 	this.Input = make([]Network, len(input))
 	copy(this.Input, input)
 
 	// Sort input.
-	sort.Sort(ByLeft(this.Input))
+	sort.Sort(ByLeftWidth(this.Input))
 
 	// Remove overlapping networks.
 	i := 0
