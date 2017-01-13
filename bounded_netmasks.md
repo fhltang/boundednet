@@ -86,22 +86,6 @@ Now suppose that `q[i]` is a network in solution `x` in `Solutions(M-1, n)` and 
  
 and so the expression `MinSize(M-1, n) + size(LeastNetwork(n, N)` overestimates when computing the minimum.  However, since `LeastNetwork(n, N)` is a superset of `p[N-1]` and `q[i]` is a superset of `LeastNetwork(n, N)`, this means that `x` is also in `Solutions(M-1, N)`.  By monotonicity of `MinSize`, we know that `MinSize(M-1, n) == MinSize(M-1, N)`.  Thus we have shown that the overestimate does not change the value of the minimum.
 
-### An Optimisation
-
-Define `RightBound(M, N)` to be the right-most address covered by all solutions in `Solutions(M, N)`, i.e.
-
-    RightBound(M, N) := max{ max(union(x)) for x in Solutions(M, N) }
-
-Therefore, `max(p[N-1]) <= RightBound(M, N-1)` iff there is a solution in `Solutions(M, N-1)` that is also in `Solutions(M, N)`.
-
-The value `RightBound(M, N)` can also be expressed recursively as
-* if `max(p[N-1]) <= RightBound(M, N-1)`, then `RightBound(M, N) == RightBound(M, N-1)`
-* otherwise, `RightBound(M, N) == max{ LeastNetwork(n, N) }` for those `n<=N` giving the minimal values for `MinSize(M-1, n) + size(LeastNetwork(n, N))`.
-
-Therefore `MinSize(M, N)` can be expressed recursively as
-   * if `max(p[N-1]) <= RightBound(M, N-1)` then `MinSize(M, N) == MinSize(M, N-1)`
-   * otherwise `MinSize(M, N) == min{ MinSize(M-1, n) + size(LeastNetwork(n, N)) for n<=N }`
-
 ### Dynamic Programming
 
 We compute the tables `MinSize` and `RightBound` for each row `M` starting from `1` and for increasing values of `N` from `1` to `N0`. 
