@@ -1,4 +1,4 @@
-# Bounded Netmasks Problem
+# Bounded Networks Problem
 
 ## Problem Statement
 
