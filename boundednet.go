@@ -6,8 +6,8 @@ import (
 
 type Address uint32
 
+// A network represented as a closed-open interval [Left, Right).
 type Network struct {
-	// close-open interval
 	Left  Address
 	Right Address
 }
@@ -20,6 +20,20 @@ func (this Network) Size() int {
 	return int(this.Right - this.Left)
 }
 
+// Normalise network into form [x*2^k, y*2^k) for largest k.
+func (this Network) Normalise() (int, int, uint) {
+	k := uint(0)
+	x := int(this.Left)
+	y := int(this.Right)
+	for x != y && x%2 == 0 && y%2 == 0 {
+		k++
+		x = x >> 1
+		y = y >> 1
+	}
+	return x, y, k
+}
+
+// Determine if a network is valid.
 func (this Network) Valid() bool {
 	if this.Right < this.Left {
 		return false
@@ -30,17 +44,12 @@ func (this Network) Valid() bool {
 	}
 
 	// Try to find a, k such that this == [a*2^k, (a+1)*2^k)
-	a := this.Left
-	a1 := this.Right
-	for a != a1 && a%2 == 0 && a1%2 == 0 {
-		a = a >> 1
-		a1 = a1 >> 1
-	}
+	a, a1, _ := this.Normalise()
 	return a+1 == a1
 }
 
+// Alternative representation of network [A*2^K, (A+1)*2^K)
 type NonEmptyNetwork struct {
-	// Rerpresents network [A*2^K, (A+1)*2^K)
 	A int
 	K uint
 }
@@ -50,15 +59,8 @@ func (this Network) ToNonEmptyNetwork() NonEmptyNetwork {
 		panic("Not a valid non-empty network")
 	}
 
-	// Try to find a, k such that this == [a*2^k, (a+1)*2^k)
-	k := uint(0)
-	a := int(this.Left)
-	a1 := int(this.Right)
-	for a != a1 && a%2 == 0 && a1%2 == 0 {
-		k++
-		a = a >> 1
-		a1 = a1 >> 1
-	}
+	// Find a, k such that this == [a*2^k, (a+1)*2^k)
+	a, _, k := this.Normalise()
 	return NonEmptyNetwork{A: a, K: k}
 }
 
@@ -74,27 +76,34 @@ type Solver interface {
 }
 
 type TableCell struct {
+	// Size of a minimal solution.
 	MinSize int
+
+	// A minimal solution is obtained by combining Network with a
+	// subsolution (NextRow, NextCol).
+	//
+	// Used by backtracking algorithm.
 	NextRow int
 	NextCol int
 	Network Network
 }
 
 type BacktrackingSolver struct {
+	// Inputs.
 	Input []Network
 	M     int
 
+	// Precomputed values of LeastNetwork().
 	leastNetwork [][]Network
-	Table        [][]TableCell
+
+	// Table used in dynamic programming solution.
+	Table [][]TableCell
 }
 
 func (this *BacktrackingSolver) Solve(input []Network, m int) []Network {
 	this.Init(input, m)
-
 	this.PrecomputeLeastNetwork()
-
 	this.ComputeTable()
-
 	return this.Backtrack(this.M, len(this.Input))
 }
 
@@ -186,9 +195,7 @@ func (this BacktrackingSolver) computeCell(m, k int) TableCell {
 		}
 	}
 
-	minimalSolution := TableCell{
-		MinSize: 1 << 32, // max
-	}
+	minimalSolution := TableCell{MinSize: 1 << 32} // max
 	for n := 0; n <= k; n++ {
 		network := this.LeastNetwork(n+1, k+1)
 		presolutionSize := network.Size() + this.Table[m-1][n].MinSize
