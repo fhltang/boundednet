@@ -141,15 +141,14 @@ func (this *BacktrackingSolver) PrecomputeLeastNetwork() {
 		this.leastNetwork = append(
 			this.leastNetwork, make([]Network, j+1))
 		for i := 0; i <= j; i++ {
-			this.computeLeastNetwork(i, j)
+			this.leastNetwork[j][i] = this.computeLeastNetwork(i, j)
 		}
 	}
 }
 
-func (this *BacktrackingSolver) computeLeastNetwork(i, j int) {
+func (this BacktrackingSolver) computeLeastNetwork(i, j int) Network {
 	if i == j {
-		this.leastNetwork[j][i] = EmptyNetwork()
-		return
+		return EmptyNetwork()
 	}
 
 	left := this.Input[i].ToNonEmptyNetwork()
@@ -165,7 +164,7 @@ func (this *BacktrackingSolver) computeLeastNetwork(i, j int) {
 			left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
 		}
 	}
-	this.leastNetwork[j][i] = left.ToNetwork()
+	return left.ToNetwork()
 }
 
 func (this *BacktrackingSolver) ComputeTable() {
@@ -173,27 +172,28 @@ func (this *BacktrackingSolver) ComputeTable() {
 	for m := 0; m < this.M; m++ {
 		this.Table[m] = make([]TableCell, len(this.Input))
 		for k := 0; k < len(this.Input); k++ {
-			this.computeCell(m, k)
+			this.Table[m][k] = this.computeCell(m, k)
 		}
 	}
 }
 
-func (this *BacktrackingSolver) computeCell(m, k int) {
+func (this BacktrackingSolver) computeCell(m, k int) TableCell {
 	if m == 0 {
 		network := this.LeastNetwork(0, k+1)
-		this.Table[m][k] = TableCell{
+		return TableCell{
 			MinSize: network.Size(),
 			Network: network,
 		}
-		return
 	}
 
-	this.Table[m][k].MinSize = 1 << 32 // max
+	minimalSolution := TableCell{
+		MinSize: 1 << 32, // max
+	}
 	for n := 0; n <= k; n++ {
 		network := this.LeastNetwork(n+1, k+1)
 		presolutionSize := network.Size() + this.Table[m-1][n].MinSize
-		if presolutionSize < this.Table[m][k].MinSize {
-			this.Table[m][k] = TableCell{
+		if presolutionSize < minimalSolution.MinSize {
+			minimalSolution = TableCell{
 				MinSize: presolutionSize,
 				Network: network,
 				NextRow: m - 1,
@@ -201,6 +201,7 @@ func (this *BacktrackingSolver) computeCell(m, k int) {
 			}
 		}
 	}
+	return minimalSolution
 }
 
 func (this *BacktrackingSolver) Backtrack(m, n int) []Network {
