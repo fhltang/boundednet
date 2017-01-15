@@ -22,7 +22,7 @@ We assume a set of input networks `B := {p[0], ..., p[N-1]}`.
 For any subset `x` of `B`
 
    * define `Presolutions(M, x)` to be the set of presolutions where a presolution is a set of at most `M` networks whose footprint is a superset of the footprint of `x`
-   * define `MinSize(M, x)` to be `min(size(Presolutions(M, x)))`, i.e. the smallest footprint size of all presolutions in `PreSolution(M, x)`
+   * define `MinSize(M, x)` to be `min{ size(union(y)) for y in Presolutions(M, x) }`, i.e. the smallest footprint size of all presolutions in `PreSolution(M, x)`
    * define `Solutions(M, x)` to be the subset of `Presolutions(M, x)` whose elements have footprint size `MinSize(M, x)`.
    
 Note that for non-empty `x`, `Solutions(1, x)` is guaranteed to be a singleton set.  We define `LeastNetwork(x)` to be the element in `Solutions(1, x)`.
