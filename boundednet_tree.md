@@ -13,10 +13,6 @@ You are given `N` networks and you need to return `M` networks where the `M` net
    
 ## Initial Observations
 
-*Network intersections*: if two networks have a non-empty intersection, then necessarily one network is a subset of the other or vice-versa.
-
-*Minimal footprint size*: since the footprint of the `M` networks includes that of the `N` networks, then minimising the footprint size of the `M` networks also minimises the additional addresses that are not in the `M` networks.  We say that a footprint is minimal if it has minimal size.
-
 *Left and Right Subnetworks*: for any `[a, b)` of size greater than 1 (i.e. `b > a+1`), its addresses can be partitioned into a *Left Subnetwork* `[a, (a+b)/2)` and a *Right Subnetwork* `[(a+b)/2, y)`.
 
 ## Solution Overview
