@@ -45,6 +45,8 @@ The solution is based on the following recursive formulation of `MinSize(M, x)`:
 
 For any set `x` of networks from `B`, we can find the least network `LeastNetwork(x)` which is a superset of the footprint of `x`.  This least network partitions `x` into Left and Right subsets.  For each `j` between `1` and `M-1`, we can construct a presolution by taking a solution of up to size `j` from the left partition together with a solution of up to size `M-j` from the right partition.  Clearly there is a solution in `Solutions(M, x)` amongst one of these presolutions.
 
+## Solution
+
 To compute `MinSize(M, B)` efficiently, we construct a binary tree of networks as follows:
 
    * `LeastNetwork(B)` is the root node of the tree
