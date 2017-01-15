@@ -31,7 +31,7 @@ If the networks do not satisfy these assumptions, we can sort them and remove ov
 We consider solutions for smaller versions of the problem.  For `N <= N0`, we 
 
    * define `Presolution(M, N)` to be the set of *presolutions* where a presolution is a set of at most `M` networks whose footprint is a superset of the footprint of the first `N` input networks `{p[0], ..., p[N-1]}`
-   * define `MinSize(M, N)` to be `min(size(Presolutions(M, N)))`, i.e. the smallest size footprint size of all presolutions in `PreSolution(M, N)`
+   * define `MinSize(M, N)` to be `min{ size(union(y)) for y in Presolutions(M, N) }`, i.e. the smallest size footprint size of all presolutions in `PreSolution(M, N)`
    * define `Solutions(M, N)` to be the subset of `Presolutions(M, N)` whose elements all have footprint size `MinSize(M, N)`.
 
 The key is finding a formulation of the function `MinSize(M, N)` recursive in `M` and `N`.  The recursive formulation allows us to apply the standard dynamic programming trick to compute an `M * N` table.  The table can be used to backtrack and obtain the `M` networks which attain a minimal footprint.
