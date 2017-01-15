@@ -53,7 +53,9 @@ To compute `MinSize(M, B)` efficiently, we construct a binary tree of networks a
    
 Note that for any nonempty subset `x` of `B`, both `Left(LeastNetwork(x))` and `Right(LeastNetwork(x))` are non-empty.  To see why this is so, if `Left(LeastNetwork(x))` is empty then `Right(LeastNetwork(x))` is a superset of `x` and strictly smaller than `LeastNetwork(x)` which is a contradiction.  The same argument applies if `Right(LeastNetwork(x))` is empty.
 
-The tree has `N` leaves and since it is a binary tree, it must have `N-1` inner nodes.
+Assuming no overlapping networks in `B`, the tree has `N` leaves and since it is a binary tree, it must have `N-1` inner nodes.
+
+This tree can be computed efficiently if `B` is sorted and overlapping networks are removed.  By enumerating the remaining non-overlapping networks in `B` as `p[0], ..., p[N-1]`, all subsets of `B` of interest can be represented as pairs of indices. `LeastNetwork(x)` can be computed in `O(1)` time for any `x`.  The subsets `Left(q)` and `Right(q)` can determined in `log(size(q))` via binary search.  Since there are `O(N)` tree nodes, the tree can be computed in `O(N * log(N))` time (including sorting and overlap removal).
 
 We compute `MinSize(j, q)` for each node (children first) for `1<=j<=K` where `K` is `M` less the distance from the root node.
 
@@ -61,3 +63,13 @@ We can find a solution in `Solutions(M, LeastNetwork(B))` by traversing the tree
 
    * if `M==1`, emit `LeastNetwork(q)`
    * if `j>1`, do not emit any network but traverse the left child with bound `j` and the right child with bound `M-j`.
+   
+### Asymptotic Complexity
+
+   * Sorting input networks: `O(N * log(N))`
+   * Removing overlapping networks: `O(N)`
+   * Building tree of networks: `O(N * log(N))`
+   * Computing `MinSize(M, q)`: `O(M * N)`
+   * Find a solution using the tree: `O(N)`
+
+Overall: `O(N * log(N)) + O(M * N)`
