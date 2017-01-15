@@ -47,7 +47,7 @@ For any set `x` of networks from `B`, we can find the least network `LeastNetwor
 
 To compute `MinSize(M, B)` efficiently, we construct a binary tree of networks as follows:
 
-   * LeastNetwork(B) is the root node of the tree
+   * `LeastNetwork(B)` is the root node of the tree
    * for each node `q` if `q` is in `B`, then it is a leaf
    * otherwise `q` has child nodes `LeastNetwork(Left(q))` and `LeastNetwork(Right(q))`
    
