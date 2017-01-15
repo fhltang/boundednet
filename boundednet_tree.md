@@ -53,7 +53,7 @@ To compute `MinSize(M, B)` efficiently, we construct a binary tree of networks a
    
 Note that for any nonempty subset `x` of `B`, both `Left(LeastNetwork(x))` and `Right(LeastNetwork(x))` are non-empty.  To see why this is so, if `Left(LeastNetwork(x))` is empty then `Right(LeastNetwork(x))` is a superset of `x` and strictly smaller than `LeastNetwork(x)` which is a contradiction.  The same argument applies if `Right(LeastNetwork(x))` is empty.
 
-Thus the tree has `N` leaves and `N-1` inner nodes.
+The tree has `N` leaves and since it is a binary tree, it must have `N-1` inner nodes.
 
 We compute `MinSize(j, q)` for each node (children first) for `1<=j<=K` where `K` is `M` less the distance from the root node.
 
