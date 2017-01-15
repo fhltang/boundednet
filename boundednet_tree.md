@@ -1,0 +1,67 @@
+# Bounded Networks Problem
+
+## Problem Statement
+
+You are given `N` networks and you need to return `M` networks where the `M` networks contain the IPs from the `N` but minimise the number of additional IPs that are not in the `M` networks.
+
+## Definitions
+
+   * An *address* is an integer in set `A = [0, 2^32)`.
+   * A *network* is a subset of `A` (i.e. a set of addresses) of the form `[ a * 2^k, (a + 1) * 2^k )` for some `a` and `k`.
+   * The *footprint* of a set of networks is the union of the networks.
+   * The *footprint size* of a set of networks (or just *size* of a set of networks) is the cardinality of the footprint, i.e. the number of addresses in the union of the networks.
+   
+## Initial Observations
+
+*Network intersections*: if two networks have a non-empty intersection, then necessarily one network is a subset of the other or vice-versa.
+
+*Minimal footprint size*: since the footprint of the `M` networks includes that of the `N` networks, then minimising the footprint size of the `M` networks also minimises the additional addresses that are not in the `M` networks.  We say that a footprint is minimal if it has minimal size.
+
+*Left and Right Subnetworks*: for any `[a, b)` of size greater than 1 (i.e. `b > a+1`), its addresses can be partitioned into a *Left Subnetwork* `[a, (a+b)/2)` and a *Right Subnetwork* `[(a+b)/2, y)`.
+
+## Solution Overview
+
+We assume a set of input networks `B := {p[0], ..., p[N-1]}`.
+
+For any subset `x` of `B`
+
+   * define `Presolutions(M, x)` to be the set of presolutions where a presolution is a set of at most `M` networks whose footprint is a superset of the footprint of `x`
+   * define `MinSize(M, x)` to be `min(size(Presolutions(M, x)))`, i.e. the smallest footprint size of all presolutions in `PreSolution(M, x)`
+   * define `Solutions(M, x)` to be the subset of `Presolutions(M, x)` whose elements have footprint size `MinSize(M, x)`.
+   
+Note that for non-empty `x`, `Solutions(1, x)` is guaranteed to be a singleton set.  We define `LeastNetwork(x)` to be the element in `Solutions(1, x)`.
+
+Also, we clearly have
+
+    MinSize(M, B) == MinSize(M, {LeastNetwork(B)})
+    
+and
+
+    Solutions(M, B) == Solutions(M, {LeastNetwork(B)})
+
+For network `q`, we define subsets of `B`
+   * `Left(q)` to be the set of networks which are subsets of the Left Subnetwork of `q`,
+   * `Right(q)` to be the set of networks which are the subsets of the Right Subnetwork of `q`.
+   
+The solution is based on the following recursive formulation of `MinSize(M, x)`:
+
+    MinSize(M, x) == min{ MinSize(j, Left(LeastNetwork(x))) + MinSize(M-j, Right(LeastNetwork(x))) for 1 <= j <= M-1 }
+
+For any set `x` of networks from `B`, we can find the least network `LeastNetwork(x)` which is a superset of the footprint of `x`.  This least network partitions `x` into Left and Right subsets.  For each `j` between `1` and `M-1`, we can construct a presolution by taking a solution of up to size `j` from the left partition together with a solution of up to size `M-j` from the right partition.  Clearly there is a solution in `Solutions(M, x)` amongst one of these presolutions.
+
+To compute `MinSize(M, B)` efficiently, we construct a binary tree of networks as follows:
+
+   * LeastNetwork(B) is the root node of the tree
+   * for each node `q` if `q` is in `B`, then it is a leaf
+   * otherwise `q` has child nodes `LeastNetwork(Left(q))` and `LeastNetwork(Right(q))`
+   
+Note that for any nonempty subset `x` of `B`, both `Left(LeastNetwork(x))` and `Right(LeastNetwork(x))` are non-empty.  To see why this is so, if `Left(LeastNetwork(x))` is empty then the other `Right(LeastNetwork(x))` is a superset of `x` and strictly smaller than `LeastNetwork(x)` which is a contradiction.  The same argument applies if `Right(LeastNetwork(x))` is empty.
+
+Thus the tree has `N` leaves and `N-1` inner nodes.
+
+We compute `MinSize(j, q)` for each node (children first) for `1<=j<=K` where `K` is `M` less the distance from the root node.
+
+We can find a solution in `Solutions(M, LeastNetwork(B))` by traversing the tree again and picking a `j` which attains the minimum at each node.  Starting from the root node `q` and bound `M`,
+
+   * if `M==1`, emit `LeastNetwork(q)`
+   * if `j>1`, do not emit any network but traverse the left child with bound `j` and the right child with bound `M-j`.
