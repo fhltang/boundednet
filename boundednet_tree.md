@@ -22,7 +22,7 @@ We assume a set of input networks `B := {p[0], ..., p[N-1]}`.
 For any subset `x` of `B`
 
    * define `Presolutions(M, x)` to be the set of presolutions where a presolution is a set of at most `M` networks whose footprint is a superset of the footprint of `x`
-   * define `MinSize(M, x)` to be `min{ size(union(y)) for y in Presolutions(M, x) }`, i.e. the smallest footprint size of all presolutions in `PreSolution(M, x)`
+   * define `MinSize(M, x)` to be `min{ size(union(y)) for y in Presolutions(M, x) }`, i.e. the smallest footprint size of all presolutions in `Presolutions(M, x)`
    * define `Solutions(M, x)` to be the subset of `Presolutions(M, x)` whose elements have footprint size `MinSize(M, x)`.
    
 Note that for non-empty `x`, `Solutions(1, x)` is guaranteed to be a singleton set.  We define `LeastNetwork(x)` to be the element in `Solutions(1, x)`.
@@ -61,7 +61,7 @@ This tree can be computed efficiently if `B` is sorted and overlapping networks 
 
 We compute `MinSize(j, q)` for each node (children first) for `1<=j<=K` where `K` is `M` less the distance from the root node.
 
-We can find a solution in `Solutions(M, LeastNetwork(B))` by traversing the tree again and picking a `j` which attains the minimum at each node.  Starting from the root node `q` and bound `M`,
+We can find a solution in `Solutions(M, LeastNetwork(B))` by traversing the tree again and picking a `j` which attains the minimum at each node.  Of course, this `j` can be selected and stored while the minimum is computed to make the solution finding phase more efficient.  Starting from the root node `q` and bound `M`,
 
    * if `M==1`, emit `LeastNetwork(q)`
    * if `j>1`, do not emit any network but traverse the left child with bound `j` and the right child with bound `M-j`.
