@@ -1,4 +1,4 @@
-# Bounded Networks Problem
+# Bounded Networks Problem: A Snoc-Recursive Solution
 
 ## Problem Statement
 
@@ -30,8 +30,8 @@ If the networks do not satisfy these assumptions, we can sort them and remove ov
 
 We consider solutions for smaller versions of the problem.  For `N <= N0`, we 
 
-   * define `Presolution(M, N)` to be the set of *presolutions* where a presolution is a set of at most `M` networks whose footprint is a superset of the footprint of the first `N` input networks `{p[0], ..., p[N-1]}`
-   * define `MinSize(M, N)` to be `min{ size(union(y)) for y in Presolutions(M, N) }`, i.e. the smallest size footprint size of all presolutions in `PreSolution(M, N)`
+   * define `Presolutions(M, N)` to be the set of *presolutions* where a presolution is a set of at most `M` networks whose footprint is a superset of the footprint of the first `N` input networks `{p[0], ..., p[N-1]}`
+   * define `MinSize(M, N)` to be `min{ size(union(y)) for y in Presolutions(M, N) }`, i.e. the smallest size footprint size of all presolutions in `PreSolutions(M, N)`
    * define `Solutions(M, N)` to be the subset of `Presolutions(M, N)` whose elements all have footprint size `MinSize(M, N)`.
 
 The key is finding a formulation of the function `MinSize(M, N)` recursive in `M` and `N`.  The recursive formulation allows us to apply the standard dynamic programming trick to compute an `M * N` table.  The table can be used to backtrack and obtain the `M` networks which attain a minimal footprint.
@@ -54,7 +54,7 @@ For given `i` and `j`, `LeastNetwork(i, j)` can be computed in `O(1)` time.
 
 ### Expressing `MinSize(M, N)` Recursively
 
-We consider for all `n <= N`, partitionings of the `N` networks into the initial `n` networks and remaining `N - n` networks.  For a given `n`, we construct presolutions by taking each solution `x` in `Solutions(M-1, n)` together with the network `LeastNetwork(n, N)`.  The former covers the first `n` networks and the latter covers the remaining `N - n` networks.  We know that `x union {LeastNetwork(n, N)}` is in `Presolutions(M, N)` since it has at most `M` networks.
+We consider for all `n <= N`, partitionings of the `N` networks into the initial `n` networks and remaining `N - n` networks.  For a given `n`, we construct presolutions of the form "`[snoc](https://en.wikipedia.org/wiki/Snoc)(x, LeastNetwork(n, N))`" by taking each solution `x` in `Solutions(M-1, n)` together with the network `LeastNetwork(n, N)`.  The former covers the first `n` networks and the latter covers the remaining `N - n` networks.  We know that `x union {LeastNetwork(n, N)}` is in `Presolutions(M, N)` since it has at most `M` networks.
 
 We will now show that for `M > 1`, that
 
