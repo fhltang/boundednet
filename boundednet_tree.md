@@ -1,4 +1,4 @@
-# Bounded Networks Problem
+# Bounded Networks Problem: A Tree-Recursive Solution
 
 ## Problem Statement
 
