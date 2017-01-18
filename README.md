@@ -54,7 +54,7 @@ For given `i` and `j`, `LeastNetwork(i, j)` can be computed in `O(1)` time.
 
 ### Expressing `MinSize(M, N)` Recursively
 
-We consider for all `n <= N`, partitionings of the `N` networks into the initial `n` networks and remaining `N - n` networks.  For a given `n`, we construct presolutions of the form "`[snoc](https://en.wikipedia.org/wiki/Snoc)(x, LeastNetwork(n, N))`" by taking each solution `x` in `Solutions(M-1, n)` together with the network `LeastNetwork(n, N)`.  The former covers the first `n` networks and the latter covers the remaining `N - n` networks.  We know that `x union {LeastNetwork(n, N)}` is in `Presolutions(M, N)` since it has at most `M` networks.
+We consider for all `n <= N`, partitionings of the `N` networks into the initial `n` networks and remaining `N - n` networks.  For a given `n`, we construct presolutions of the form `snoc(x, LeastNetwork(n, N))` by taking each solution `x` in `Solutions(M-1, n)` together with the network `LeastNetwork(n, N)`.  The former covers the first `n` networks and the latter covers the remaining `N - n` networks.  We know that `x union {LeastNetwork(n, N)}` is in `Presolutions(M, N)` since it has at most `M` networks.
 
 We will now show that for `M > 1`, that
 
