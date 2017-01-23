@@ -70,6 +70,86 @@ func TestToNonEmptyNetwork(t *testing.T) {
 	}
 }
 
+func TestNormaliseInput(t *testing.T) {
+	type Case struct {
+		Name     string
+		Input    []bn.Network
+		Expected []bn.Network
+	}
+	cases := []Case{
+		{
+			"SortedNoOverlap",
+			[]bn.Network{
+				bn.Network{0, 1},
+				bn.Network{1, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+			[]bn.Network{
+				bn.Network{0, 1},
+				bn.Network{1, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+		},
+		{
+			"SortedWithFullOverlap",
+			[]bn.Network{
+				bn.Network{0, 1},
+				bn.Network{0, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+			[]bn.Network{
+				bn.Network{0, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+		},
+		{
+			"UnsortedNoOverlap",
+			[]bn.Network{
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+				bn.Network{0, 1},
+				bn.Network{1, 2},
+			},
+			[]bn.Network{
+				bn.Network{0, 1},
+				bn.Network{1, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+		},
+		{
+			"UnsortedWithOverlap",
+			[]bn.Network{
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+				bn.Network{35, 36},
+				bn.Network{0, 1},
+				bn.Network{1, 2},
+			},
+			[]bn.Network{
+				bn.Network{0, 1},
+				bn.Network{1, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			input := bn.NormaliseInput(tc.Input)
+			if !reflect.DeepEqual(tc.Expected, input) {
+				t.Error("Expected", tc.Expected,
+					"got", input)
+			}
+		})
+	}
+
+}
+
 func TestSnocSolver(t *testing.T) {
 	input := []bn.Network{
 		bn.Network{0, 1},

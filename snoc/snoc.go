@@ -4,7 +4,6 @@ package snoc
 
 import (
 	bn "github.com/fhltang/boundednet"
-	"sort"
 )
 
 type TableCell struct {
@@ -39,36 +38,8 @@ func (this *BacktrackingSolver) Solve(input []bn.Network, m int) []bn.Network {
 	return this.Backtrack(this.M, len(this.Input))
 }
 
-type ByLeftWidth []bn.Network
-
-func (this ByLeftWidth) Len() int      { return len(this) }
-func (this ByLeftWidth) Swap(i, j int) { this[i], this[j] = this[j], this[i] }
-func (this ByLeftWidth) Less(i, j int) bool {
-	if this[i].Left == this[j].Left {
-		return this[i].Right > this[j].Right
-	}
-	return this[i].Left < this[j].Left
-}
-
 func (this *BacktrackingSolver) Init(input []bn.Network, m int) {
-	this.Input = make([]bn.Network, len(input))
-	copy(this.Input, input)
-
-	// Sort input.
-	sort.Sort(ByLeftWidth(this.Input))
-
-	// Remove overlapping networks.
-	i := 0
-	for j := 0; j < len(this.Input)-1; j++ {
-		if this.Input[j].Right <= this.Input[j+1].Left {
-			if i < j {
-				this.Input[i+1] = this.Input[j+1]
-			}
-			i++
-		}
-	}
-	this.Input = this.Input[:i+1]
-
+	this.Input = bn.NormaliseInput(input)
 	this.M = m
 }
 
