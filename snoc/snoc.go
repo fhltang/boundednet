@@ -53,30 +53,9 @@ func (this *BacktrackingSolver) PrecomputeLeastNetwork() {
 		this.leastNetwork = append(
 			this.leastNetwork, make([]bn.Network, j+1))
 		for i := 0; i <= j; i++ {
-			this.leastNetwork[j][i] = this.computeLeastNetwork(i, j)
+			this.leastNetwork[j][i] = bn.LeastNetwork(this.Input, i, j)
 		}
 	}
-}
-
-func (this BacktrackingSolver) computeLeastNetwork(i, j int) bn.Network {
-	if i == j {
-		return bn.EmptyNetwork()
-	}
-
-	left := this.Input[i].ToNonEmptyNetwork()
-	right := this.Input[j-1].ToNonEmptyNetwork()
-	for left != right {
-		if right.K < left.K {
-			right = bn.NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
-		} else if left.K < right.K {
-			left = bn.NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
-		} else if left.A < right.A {
-			right = bn.NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
-		} else if right.A < left.A {
-			left = bn.NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
-		}
-	}
-	return left.ToNetwork()
 }
 
 func (this *BacktrackingSolver) ComputeTable() {

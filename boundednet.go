@@ -36,3 +36,25 @@ func NormaliseInput(input []Network) []Network {
 	result = result[:i+1]
 	return result
 }
+
+func LeastNetwork(networks []Network, i, j int) Network {
+	if i == j {
+		return EmptyNetwork()
+	}
+
+	left := networks[i].ToNonEmptyNetwork()
+	right := networks[j-1].ToNonEmptyNetwork()
+	for left != right {
+		if right.K < left.K {
+			right = NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
+		} else if left.K < right.K {
+			left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
+		} else if left.A < right.A {
+			right = NonEmptyNetwork{A: right.A >> 1, K: right.K + 1}
+		} else if right.A < left.A {
+			left = NonEmptyNetwork{A: left.A >> 1, K: left.K + 1}
+		}
+	}
+	return left.ToNetwork()
+}
+
