@@ -3,6 +3,7 @@ package boundednet_test
 import (
 	"fmt"
 	bn "github.com/fhltang/boundednet"
+	"github.com/fhltang/boundednet/binary"
 	"github.com/fhltang/boundednet/snoc"
 	"reflect"
 	"testing"
@@ -150,7 +151,7 @@ func TestNormaliseInput(t *testing.T) {
 
 }
 
-func TestSnocSolver(t *testing.T) {
+func TestSolvers(t *testing.T) {
 	input := []bn.Network{
 		bn.Network{0, 1},
 		bn.Network{1, 2},
@@ -160,6 +161,7 @@ func TestSnocSolver(t *testing.T) {
 
 	solvers := []bn.Solver{
 		snoc.Solve,
+		binary.Solve,
 	}
 
 	type Case struct {
