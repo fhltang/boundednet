@@ -67,19 +67,19 @@ func (this *Solver) BuildTree(i, j, depth int) *Node {
 	}
 
 	node := &Node{
-		MinSize: make([]int, max(0, this.M - depth)),
-		LeftSolution: make([]int, max(0, this.M - depth)),
+		MinSize:      make([]int, max(0, this.M-depth)),
+		LeftSolution: make([]int, max(0, this.M-depth)),
 	}
 
 	node.Network = bn.LeastNetwork(this.Input, i, j)
 
-	if j - i > 1 {
+	if j-i > 1 {
 		midAddr := (node.Network.Left + node.Network.Right) / 2
-		midIdx := i + sort.Search(j - i, func(k int) bool {
-			return midAddr <= this.Input[i + k].Left
+		midIdx := i + sort.Search(j-i, func(k int) bool {
+			return midAddr <= this.Input[i+k].Left
 		})
-		node.Left = this.BuildTree(i, midIdx, depth + 1)
-		node.Right = this.BuildTree(midIdx, j, depth + 1)
+		node.Left = this.BuildTree(i, midIdx, depth+1)
+		node.Right = this.BuildTree(midIdx, j, depth+1)
 	}
 
 	return node
@@ -96,13 +96,13 @@ func (this *Solver) ComputeMinSize(node *Node) {
 	node.MinSize[0] = node.Network.Size()
 
 	for m := 1; m < len(node.MinSize); m++ {
-		node.MinSize[m], node.LeftSolution[m] = node.MinSize[m - 1], 0
+		node.MinSize[m], node.LeftSolution[m] = node.MinSize[m-1], 0
 		if node.Left == nil || node.Right == nil {
 			continue
 		}
 		for i := 1; i <= m; i++ {
-			if (i - 1) < len(node.Left.MinSize) && (m - i) < len(node.Right.MinSize) {
-				presolutionSize := node.Left.MinSize[i - 1] + node.Right.MinSize[m - i]
+			if (i-1) < len(node.Left.MinSize) && (m-i) < len(node.Right.MinSize) {
+				presolutionSize := node.Left.MinSize[i-1] + node.Right.MinSize[m-i]
 				if presolutionSize < node.MinSize[m] {
 					node.MinSize[m], node.LeftSolution[m] = presolutionSize, i
 				}
@@ -118,7 +118,7 @@ func (this *Solver) Backtrack(node *Node, m int) []bn.Network {
 
 	result := make([]bn.Network, 0, m)
 	result = append(result, this.Backtrack(node.Left, node.LeftSolution[m-1])...)
-	result = append(result, this.Backtrack(node.Right, m - node.LeftSolution[m-1])...)
+	result = append(result, this.Backtrack(node.Right, m-node.LeftSolution[m-1])...)
 	return result
 }
 
