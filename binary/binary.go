@@ -19,13 +19,18 @@ type Node struct {
 	// Left and right child nodes.
 	Left, Right *Node
 
-	// Size of minimal solution by index M.  Index 0 is size of
-	// minimal solution for M=1.
+	// Size of minimal solution with up to M networks.  Index 0 is
+	// size of minimal solution for M=1.
 	MinSize []int
 
 	// Minimal solution for M=1
 	Network bn.Network
 
+	// Used to recover minimal solution.  Minimal solution with at
+	// most M networks is attained by taking a minimal solution
+	// with at most `LeftSolution[M-1]` networks from the left
+	// subnet together with a minimal solution with at most `M -
+	// LeftSolution[M-1]` networks from the right subnet.
 	LeftSolution []int
 }
 
@@ -33,9 +38,6 @@ func (this *Node) String() string {
 	if this == nil {
 		return "NIL"
 	}
-	// return fmt.Sprintf(
-	// 	"{ Left: %s, Right: %s, Network: %v }",
-	// 	this.Left.String(), this.Right.String(), this.Network)
 	return fmt.Sprintf("%v", *this)
 }
 
