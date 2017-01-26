@@ -114,14 +114,17 @@ func (this *Solver) ComputeMinSize(node *Node) {
 }
 
 func (this *Solver) Backtrack(node *Node, m int) []bn.Network {
+	result := make([]bn.Network, 0, m)
+	return this.backtrack(result, node, m)
+}
+
+func (this *Solver) backtrack(dest []bn.Network, node *Node, m int) []bn.Network {
 	if m == 1 {
-		return []bn.Network{node.Network}
+		return append(dest, node.Network)
 	}
 
-	result := make([]bn.Network, 0, m)
-	result = append(result, this.Backtrack(node.Left, node.LeftSolution[m-1])...)
-	result = append(result, this.Backtrack(node.Right, m-node.LeftSolution[m-1])...)
-	return result
+	dest = this.backtrack(dest, node.Left, node.LeftSolution[m-1])
+	return this.backtrack(dest, node.Right, m-node.LeftSolution[m-1])
 }
 
 func Solve(input []bn.Network, m int) []bn.Network {
