@@ -7,4 +7,4 @@ You are given `N` networks and you need to return `M` networks where the `M` net
 ## Solutions
 
    * [Snoc-recursive](snoc/README.md) solution: `O( N^2 * M )`.
-   * [Binary-tree-recursive](binary/README.md) solution (aka Mulrich's solution): `O( N * log(N) ) + O( M * N )`.
+   * [Binary-tree-recursive](binary/README.md) solution (aka Mulrich's solution): `O( N * log(N) ) + O( N * M^2 )`.

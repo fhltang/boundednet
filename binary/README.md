@@ -73,7 +73,7 @@ We can find a solution in `Solutions(M, LeastNetwork(Input))` by traversing the 
    * Sorting input networks: `O(N * log(N))`
    * Removing overlapping networks: `O(N)`
    * Building tree of networks: `O(N * log(N))`
-   * Computing `MinSize(M, q)`: `O(M * N)`
+   * Computing `MinSize(M, q)`: `O(N * M^2)`
    * Find a solution using the tree: `O(N)`
 
-Overall: `O(N * log(N)) + O(M * N)`
+Overall: `O(N * log(N)) + O(N * M^2)`
