@@ -98,7 +98,7 @@ func (this *Solver) ComputeMinSize(node *Node) {
 	node.MinSize[0] = node.Network.Size()
 
 	for m := 1; m < len(node.MinSize); m++ {
-		node.MinSize[m], node.LeftSolution[m] = node.MinSize[m-1], 0
+		node.MinSize[m], node.LeftSolution[m] = node.MinSize[m-1], node.LeftSolution[m-1]
 		if node.Left == nil || node.Right == nil {
 			continue
 		}
@@ -119,7 +119,7 @@ func (this *Solver) Backtrack(node *Node, m int) []bn.Network {
 }
 
 func (this *Solver) backtrack(dest []bn.Network, node *Node, m int) []bn.Network {
-	if m == 1 {
+	if m == 1 || node.Left == nil || node.Right == nil {
 		return append(dest, node.Network)
 	}
 

@@ -159,9 +159,13 @@ func TestSolvers(t *testing.T) {
 		bn.Network{60, 64},
 	}
 
-	solvers := []bn.Solver{
-		snoc.Solve,
-		binary.Solve,
+	type Solver struct {
+		Name string
+		Solve bn.Solver
+	}
+	solvers := []Solver{
+		{"snoc", snoc.Solve},
+		{"binary", binary.Solve},
 	}
 
 	type Case struct {
@@ -182,10 +186,10 @@ func TestSolvers(t *testing.T) {
 			bn.Network{60, 64},
 		}},
 	}
-	for _, solve := range solvers {
+	for _, solver := range solvers {
 		for _, tc := range cases {
-			t.Run(fmt.Sprintf("M=%d", tc.M), func(t *testing.T) {
-				solution := solve(input, tc.M)
+			t.Run(fmt.Sprintf("%s M=%d", solver.Name, tc.M), func(t *testing.T) {
+				solution := solver.Solve(input, tc.M)
 				if !reflect.DeepEqual(tc.Expected, solution) {
 					t.Error("Expected", tc.Expected,
 						"got", solution)
