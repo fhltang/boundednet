@@ -1,6 +1,8 @@
 package boundednet
 
-type Address uint32
+// For convenience, we allow 2^32 as an "address" since this allows us
+// to express networks as closed-open intervals.
+type Address uint64
 
 // A network represented as a closed-open interval [Left, Right).
 type Network struct {
