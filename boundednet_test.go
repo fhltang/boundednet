@@ -152,13 +152,6 @@ func TestNormaliseInput(t *testing.T) {
 }
 
 func TestSolvers(t *testing.T) {
-	input := []bn.Network{
-		bn.Network{0, 1},
-		bn.Network{1, 2},
-		bn.Network{32, 36},
-		bn.Network{60, 64},
-	}
-
 	type Solver struct {
 		Name string
 		Solve bn.Solver
@@ -169,32 +162,59 @@ func TestSolvers(t *testing.T) {
 	}
 
 	type Case struct {
-		M        int
-		Expected []bn.Network
+		Input []bn.Network
+		Expected [][]bn.Network
 	}
 	cases := []Case{
-		{1, []bn.Network{
-			bn.Network{0, 64},
-		}},
-		{2, []bn.Network{
-			bn.Network{0, 2},
-			bn.Network{32, 64},
-		}},
-		{3, []bn.Network{
-			bn.Network{0, 2},
-			bn.Network{32, 36},
-			bn.Network{60, 64},
-		}},
+		{
+			[]bn.Network{
+				bn.Network{0, 1},
+				bn.Network{1, 2},
+				bn.Network{32, 36},
+				bn.Network{60, 64},
+			},
+			[][]bn.Network{
+				[]bn.Network{
+					bn.Network{0, 64},
+				},
+				[]bn.Network{
+					bn.Network{0, 2},
+					bn.Network{32, 64},
+				},
+				[]bn.Network{
+					bn.Network{0, 2},
+					bn.Network{32, 36},
+					bn.Network{60, 64},
+				},
+			},
+		},
+		{
+			[]bn.Network{
+				bn.Network{100 << 24, 101 << 24},
+				bn.Network{200 << 24, 201 << 24},
+			},
+			[][]bn.Network{
+				[]bn.Network{
+					bn.Network{0, 1 << 32},
+				},
+				[]bn.Network{
+					bn.Network{100 << 24, 101 << 24},
+					bn.Network{200 << 24, 201 << 24},
+				},
+			},
+		},
 	}
 	for _, solver := range solvers {
 		for _, tc := range cases {
-			t.Run(fmt.Sprintf("%s M=%d", solver.Name, tc.M), func(t *testing.T) {
-				solution := solver.Solve(input, tc.M)
-				if !reflect.DeepEqual(tc.Expected, solution) {
-					t.Error("Expected", tc.Expected,
-						"got", solution)
-				}
-			})
+			for m := 1; m <= len(tc.Expected); m++ {
+				t.Run(fmt.Sprintf("%s M=%d", solver.Name, m), func(t *testing.T) {
+					solution := solver.Solve(tc.Input, m)
+					if !reflect.DeepEqual(tc.Expected[m-1], solution) {
+						t.Error("Expected", tc.Expected[m-1],
+							"got", solution)
+					}
+				})
+			}
 
 		}
 	}
