@@ -1,5 +1,11 @@
 package boundednet
 
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
+
 // For convenience, we allow 2^32 as an "address" since this allows us
 // to express networks as closed-open intervals.
 type Address uint64
@@ -12,6 +18,37 @@ type Network struct {
 
 func EmptyNetwork() Network {
 	return Network{}
+}
+
+func ParseNetwork(netmask string) Network {
+	addrAndMask := strings.Split(netmask, "/")
+	if len(addrAndMask) != 2 {
+		panic(fmt.Sprintf("Cannot parse input %s", netmask))
+	}
+	addr, mask := addrAndMask[0], addrAndMask[1]
+
+	ones, err := strconv.ParseUint(mask, 10, 0)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot parse number %s", mask))
+	}
+
+	bytes := strings.Split(addr, ".")
+	if len(bytes) != 4 {
+		panic(fmt.Sprintf("Cannot parse address %s", bytes))
+	}
+	var left, right uint64
+	for _, b := range bytes {
+		left = left << 8
+		byte, err := strconv.ParseUint(b, 10, 64)
+		if err != nil {
+			panic(fmt.Sprintf("Cannot parse byte value %s", b))
+		}
+		left = left + byte
+	}
+	bitMask := uint64(((1 << ones) - 1) << (32 - ones))
+	left = left & bitMask
+	right = left + (uint64(1) << (32 - ones))
+	return Network{Address(left), Address(right)}
 }
 
 func (this Network) Size() int {
@@ -71,4 +108,3 @@ func (this NonEmptyNetwork) ToNetwork() Network {
 		Right: Address((this.A + 1) * (1 << this.K)),
 	}
 }
-

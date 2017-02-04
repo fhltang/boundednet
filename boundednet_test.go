@@ -15,6 +15,17 @@ func TestEmptyNetworkValid(t *testing.T) {
 	}
 }
 
+func TestParseNetwork(t *testing.T) {
+	left := uint64(192) << 24 + uint64(168) << 16 + uint64(1) << 8
+	right := uint64(192) << 24 + uint64(168) << 16 + uint64(2) << 8
+	expected := bn.Network{bn.Address(left), bn.Address(right)}
+
+	net := bn.ParseNetwork("192.168.1.0/24")
+	if expected != net {
+		t.Error("expecting", expected, "got", net)
+	}
+}
+
 func TestValid(t *testing.T) {
 	validCases := []bn.Network{
 		bn.Network{Left: 6, Right: 8},
@@ -200,6 +211,67 @@ func TestSolvers(t *testing.T) {
 				[]bn.Network{
 					bn.Network{100 << 24, 101 << 24},
 					bn.Network{200 << 24, 201 << 24},
+				},
+			},
+		},
+		{
+			[]bn.Network{
+				bn.ParseNetwork("192.168.0.0/24"),
+				bn.ParseNetwork("192.168.1.0/24"),
+				bn.ParseNetwork("192.168.3.0/24"),
+				bn.ParseNetwork("192.168.4.0/23"),
+				bn.ParseNetwork("192.168.16.0/21"),
+				bn.ParseNetwork("194.0.0.0/8"),
+				bn.ParseNetwork("200.0.0.11/32"),
+				bn.ParseNetwork("200.0.0.1/32"),
+				bn.ParseNetwork("200.0.0.13/32"),
+				bn.ParseNetwork("200.0.0.3/32"),
+				bn.ParseNetwork("200.0.0.5/32"),
+				bn.ParseNetwork("200.0.0.7/32"),
+				bn.ParseNetwork("200.0.0.9/32"),
+			},
+			[][]bn.Network{
+				[]bn.Network{
+					bn.ParseNetwork("192.0.0.0/4"),
+				},
+				[]bn.Network{
+					bn.ParseNetwork("192.0.0.0/6"),
+					bn.ParseNetwork("200.0.0.0/28"),
+				},
+				[]bn.Network{
+					bn.ParseNetwork("192.168.0.0/19"),
+					bn.ParseNetwork("194.0.0.0/8"),
+					bn.ParseNetwork("200.0.0.0/28"),
+				},
+				[]bn.Network{
+					bn.ParseNetwork("192.168.0.0/21"),
+					bn.ParseNetwork("192.168.16.0/21"),
+					bn.ParseNetwork("194.0.0.0/8"),
+					bn.ParseNetwork("200.0.0.0/28"),
+				},
+				[]bn.Network{
+					bn.ParseNetwork("192.168.0.0/22"),
+					bn.ParseNetwork("192.168.4.0/23"),
+					bn.ParseNetwork("192.168.16.0/21"),
+					bn.ParseNetwork("194.0.0.0/8"),
+					bn.ParseNetwork("200.0.0.0/28"),
+				},
+				[]bn.Network{
+					bn.ParseNetwork("192.168.0.0/23"),
+					bn.ParseNetwork("192.168.3.0/24"),
+					bn.ParseNetwork("192.168.4.0/23"),
+					bn.ParseNetwork("192.168.16.0/21"),
+					bn.ParseNetwork("194.0.0.0/8"),
+					bn.ParseNetwork("200.0.0.0/28"),
+				},
+				[]bn.Network{
+					bn.ParseNetwork("192.168.0.0/24"),
+					bn.ParseNetwork("192.168.1.0/24"),
+					bn.ParseNetwork("192.168.3.0/24"),
+					bn.ParseNetwork("192.168.4.0/23"),
+					bn.ParseNetwork("192.168.16.0/21"),
+					bn.ParseNetwork("194.0.0.0/8"),
+					bn.ParseNetwork("200.0.0.0/28"),
 				},
 			},
 		},
