@@ -264,15 +264,6 @@ func TestSolvers(t *testing.T) {
 					bn.ParseNetwork("194.0.0.0/8"),
 					bn.ParseNetwork("200.0.0.0/28"),
 				},
-				[]bn.Network{
-					bn.ParseNetwork("192.168.0.0/24"),
-					bn.ParseNetwork("192.168.1.0/24"),
-					bn.ParseNetwork("192.168.3.0/24"),
-					bn.ParseNetwork("192.168.4.0/23"),
-					bn.ParseNetwork("192.168.16.0/21"),
-					bn.ParseNetwork("194.0.0.0/8"),
-					bn.ParseNetwork("200.0.0.0/28"),
-				},
 			},
 		},
 	}
