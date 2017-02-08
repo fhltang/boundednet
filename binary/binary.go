@@ -119,7 +119,7 @@ func (this *Solver) Backtrack(node *Node, m int) []bn.Network {
 }
 
 func (this *Solver) backtrack(dest []bn.Network, node *Node, m int) []bn.Network {
-	if m == 1 || node.Left == nil || node.Right == nil {
+	if node.LeftSolution[m-1] == 0 {
 		return append(dest, node.Network)
 	}
 
