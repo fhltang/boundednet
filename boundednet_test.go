@@ -89,9 +89,27 @@ func TestNormaliseInput(t *testing.T) {
 
 }
 
+type Problem struct {
+	Addresses     []bn.Interval
+	FootprintSize int
+}
+
+func MakeProblem(x []bn.Network) *Problem {
+	intervals := bn.IntervalSlice(x)
+	return &Problem{Addresses: bn.Canonical(intervals), FootprintSize: bn.FootprintSize(intervals)}
+}
+
+func (this Problem) IsPresolution(m int, x []bn.Network) bool {
+	if len(x) > m {
+		return false
+	}
+
+	return bn.Subset(this.Addresses, bn.IntervalSlice(x))
+}
+
 func TestSolvers(t *testing.T) {
 	type Solver struct {
-		Name string
+		Name  string
 		Solve bn.Solver
 	}
 	solvers := []Solver{
@@ -100,7 +118,7 @@ func TestSolvers(t *testing.T) {
 	}
 
 	type Case struct {
-		Input []bn.Network
+		Input    []bn.Network
 		Expected [][]bn.Network
 	}
 	cases := []Case{
@@ -198,10 +216,19 @@ func TestSolvers(t *testing.T) {
 		for _, tc := range cases {
 			for m := 1; m <= len(tc.Expected); m++ {
 				t.Run(fmt.Sprintf("%s M=%d", solver.Name, m), func(t *testing.T) {
+					referenceSolution := tc.Expected[m-1]
+					problem := MakeProblem(tc.Input)
+					// Sanity check that reference solution is a presolution.
+					if !problem.IsPresolution(m, referenceSolution) {
+						t.Error("You dumbass.  The reference solution isn't even a presolution.")
+					}
+
 					solution := solver.Solve(tc.Input, m)
-					if !reflect.DeepEqual(tc.Expected[m-1], solution) {
-						t.Error("Expected", tc.Expected[m-1],
-							"got", solution)
+					if !problem.IsPresolution(m, solution) {
+						t.Error("Result is not a presolution.")
+					}
+					if bn.FootprintSize(bn.IntervalSlice(solution)) > bn.FootprintSize(bn.IntervalSlice(referenceSolution)) {
+						t.Error("Solution", solution, "is not minimal")
 					}
 				})
 			}
