@@ -10,11 +10,14 @@ import (
 // to express networks as closed-open intervals.
 type Address uint64
 
-// A network represented as a closed-open interval [Left, Right).
-type Network struct {
+// A closed-open interval [Left, Right).
+type Interval struct {
 	Left  Address
 	Right Address
 }
+
+// A network represented as a closed-open interval [Left, Right).
+type Network Interval
 
 func EmptyNetwork() Network {
 	return Network{}
