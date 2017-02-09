@@ -175,3 +175,12 @@ func FootprintSize(input []Interval) int {
 	}
 	return size
 }
+
+// Function to help convert []Network to []Interval.  Stupid that we need this at all.
+func IntervalSlice(input []Network) []Interval {
+	result := make([]Interval, 0, len(input))
+	for _, n := range input {
+		result = append(result, Interval(n))
+	}
+	return result
+}
