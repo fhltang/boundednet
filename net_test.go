@@ -82,8 +82,8 @@ func TestToNonEmptyNetwork(t *testing.T) {
 
 func TestCanonical(t *testing.T) {
 	type Case struct {
-		Name string
-		Input []bn.Interval
+		Name     string
+		Input    []bn.Interval
 		Expected []bn.Interval
 	}
 
@@ -109,6 +109,36 @@ func TestCanonical(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
 			if !reflect.DeepEqual(tc.Expected, bn.Canonical(tc.Input)) {
+				t.Fail()
+			}
+		})
+	}
+}
+
+func TestSubset(t *testing.T) {
+	type Case struct {
+		Name           string
+		Input1, Input2 []bn.Interval
+		Expected       bool
+	}
+
+	cases := []Case{
+		{"reflexive_0", []bn.Interval{}, []bn.Interval{}, true},
+		{"empty1_1", []bn.Interval{}, []bn.Interval{{1, 2}}, true},
+		{"empty2_1", []bn.Interval{{1, 2}}, []bn.Interval{}, false},
+		{"reflexive_1", []bn.Interval{{1, 2}}, []bn.Interval{{1, 2}}, true},
+		{"reflexive_2", []bn.Interval{{1, 2}, {3, 4}}, []bn.Interval{{1, 2}, {3, 4}}, true},
+		{"reflexive_2_reverse", []bn.Interval{{3, 4}, {1, 2}}, []bn.Interval{{1, 2}, {3, 4}}, true},
+		{"hole2", []bn.Interval{{2, 5}}, []bn.Interval{{1, 3}, {4, 6}}, false},
+		{"adjacent1", []bn.Interval{{2, 4}, {4, 5}}, []bn.Interval{{1, 6}}, true},
+		{"overlap2", []bn.Interval{{2, 5}}, []bn.Interval{{1, 5}, {4, 6}}, true},
+		{"hole1_hole2", []bn.Interval{{2, 3}, {6, 7}}, []bn.Interval{{1, 4}, {5, 8}}, true},
+		{"less12", []bn.Interval{{1, 2}}, []bn.Interval{{2, 4}, {5, 8}}, false},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			if tc.Expected != bn.Subset(tc.Input1, tc.Input2) {
 				t.Fail()
 			}
 		})

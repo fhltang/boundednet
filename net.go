@@ -149,3 +149,20 @@ func Canonical(input []Interval) []Interval {
 	result = result[:i+1]
 	return result
 }
+
+// Determine if a list of `Interval`s is a subset of another.
+func Subset(x, y []Interval) bool {
+	cy := Canonical(y)
+	for _, intvl := range x {
+		i := sort.Search(len(cy), func(j int) bool {
+			return cy[j].Left > intvl.Left
+		})
+		if i == 0 {
+			return false
+		}
+		if intvl.Right > cy[i-1].Right {
+			return false
+		}
+	}
+	return true
+}
