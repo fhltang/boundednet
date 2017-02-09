@@ -169,7 +169,7 @@ func TestFootprintSize(t *testing.T) {
 	}
 }
 
-func TestToIntervalSlice(t *testing.T) {
+func TestIntervalSlice(t *testing.T) {
 	input := []bn.Network{{1, 2}, {3, 4}}
 	expected := []bn.Interval{{1, 2}, {3, 4}}
 	if !reflect.DeepEqual(expected, bn.IntervalSlice(input)) {
