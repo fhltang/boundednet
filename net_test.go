@@ -144,3 +144,27 @@ func TestSubset(t *testing.T) {
 		})
 	}
 }
+
+func TestFootprintSize(t *testing.T) {
+	type Case struct {
+		Name     string
+		Input    []bn.Interval
+		Expected int
+	}
+
+	cases := []Case{
+		{"empty0", []bn.Interval{}, 0},
+		{"empty1", []bn.Interval{{1, 1}}, 0},
+		{"empty2", []bn.Interval{{1, 1}, {2, 2}}, 0},
+		{"two", []bn.Interval{{1, 4}, {6, 7}}, 4},
+		{"overlap", []bn.Interval{{1, 4}, {3, 7}}, 6},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			if tc.Expected != bn.FootprintSize(tc.Input) {
+				t.Fail()
+			}
+		})
+	}
+}

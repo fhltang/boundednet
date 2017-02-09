@@ -166,3 +166,12 @@ func Subset(x, y []Interval) bool {
 	}
 	return true
 }
+
+// Determine the size of the union of a list of `Interval`s.
+func FootprintSize(input []Interval) int {
+	size := 0
+	for _, intvl := range Canonical(input) {
+		size = size + int(intvl.Right-intvl.Left)
+	}
+	return size
+}
