@@ -2,6 +2,7 @@ package boundednet
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -110,4 +111,41 @@ func (this NonEmptyNetwork) ToNetwork() Network {
 		Left:  Address(this.A * (1 << this.K)),
 		Right: Address((this.A + 1) * (1 << this.K)),
 	}
+}
+
+// Canonicalise a list of Interval.
+//
+// Given a list of Interval, return the shortest list of intervals in
+// increasing order whose union is the same as that of the input list.
+type CanonicalOrder []Interval
+
+func (this CanonicalOrder) Len() int      { return len(this) }
+func (this CanonicalOrder) Swap(i, j int) { this[i], this[j] = this[j], this[i] }
+func (this CanonicalOrder) Less(i, j int) bool {
+	if this[i].Left == this[j].Left {
+		return this[i].Right > this[j].Right
+	}
+	return this[i].Left < this[j].Left
+}
+
+func Canonical(input []Interval) []Interval {
+	if len(input) == 0 {
+		return []Interval{}
+	}
+
+	result := make([]Interval, len(input))
+	copy(result, input)
+	sort.Sort(CanonicalOrder(result))
+	i := 0
+	for j, next := range result[1:] {
+		prev := result[i]
+		if next.Left > prev.Right {
+			i++
+			result[i], prev = result[j+1], next
+		} else if next.Right > prev.Right {
+			result[i].Right = next.Right
+		}
+	}
+	result = result[:i+1]
+	return result
 }

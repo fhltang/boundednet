@@ -3,6 +3,7 @@ package boundednet_test
 import (
 	"fmt"
 	bn "github.com/fhltang/boundednet"
+	"reflect"
 	"testing"
 )
 
@@ -76,5 +77,40 @@ func TestToNonEmptyNetwork(t *testing.T) {
 					t.Fail()
 				}
 			})
+	}
+}
+
+func TestCanonical(t *testing.T) {
+	type Case struct {
+		Name string
+		Input []bn.Interval
+		Expected []bn.Interval
+	}
+
+	cases := []Case{
+		{"empty", []bn.Interval{}, []bn.Interval{}},
+		{"singleton", []bn.Interval{{1, 2}}, []bn.Interval{{1, 2}}},
+		{"reverse", []bn.Interval{{4, 5}, {1, 2}}, []bn.Interval{{1, 2}, {4, 5}}},
+		{"adjacent", []bn.Interval{{1, 2}, {2, 3}}, []bn.Interval{{1, 3}}},
+		{"adjacent_reverse", []bn.Interval{{2, 3}, {1, 2}}, []bn.Interval{{1, 3}}},
+		{"contains", []bn.Interval{{1, 3}, {1, 2}}, []bn.Interval{{1, 3}}},
+		{"contains_reverse", []bn.Interval{{1, 2}, {1, 3}}, []bn.Interval{{1, 3}}},
+		{"overlaps", []bn.Interval{{1, 3}, {2, 4}}, []bn.Interval{{1, 4}}},
+		{"overlaps_reverse", []bn.Interval{{2, 4}, {1, 3}}, []bn.Interval{{1, 4}}},
+		{"three", []bn.Interval{{2, 4}, {1, 3}, {5, 8}}, []bn.Interval{{1, 4}, {5, 8}}},
+		{"overlaps_overlaps",
+			[]bn.Interval{{2, 4}, {1, 3}, {6, 8}, {5, 7}},
+			[]bn.Interval{{1, 4}, {5, 8}}},
+		{"overlaps_merge",
+			[]bn.Interval{{2, 4}, {1, 3}, {6, 8}, {4, 7}},
+			[]bn.Interval{{1, 8}}},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			if !reflect.DeepEqual(tc.Expected, bn.Canonical(tc.Input)) {
+				t.Fail()
+			}
+		})
 	}
 }
